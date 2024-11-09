@@ -1,12 +1,9 @@
 import {FormGroup} from '@angular/forms';
 
-/*
-
-Глобальная функция, которая получает 2 контрола и сравнивает их значения
-Может использоваться при валидации например 2х полей с паролями (чтобы подтверждали пароль)
-
-Взято из интернета запросом "angular must match function"
-
+/**
+ * Globale Funktion, die zwei Steuerelemente empfängt und deren Werte vergleicht
+ * man kann zum Beispiel bei der Validierung von 2 Passwortfeldern verwendet werden (zur Bestätigung des Passworts)
+ * entnommen aus dem Internet durch die Abfrage „Angular muss mit Funktion übereinstimmen“
  */
 
 export function MustMatch(controlName: string, matchingControlName: string): (formGroup: FormGroup) => null {

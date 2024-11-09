@@ -5,7 +5,7 @@
 
       <div class="card-body">
 
-        <!--        форма для заполнения логин-пароль-->
+        <!--Login-Passwort-Formular-->
         <form [formGroup]="form" (ngSubmit)="submitForm()">
 
           <h2 class="auth-title" *ngIf="!isMobile">Login</h2>
@@ -16,7 +16,7 @@
             </div>
 
             <div class="col-md-6 col-sm-12">
-              <!--              если хотя бы 1 раз нажали кнопку и появились ошибки валидации-->
+              <!--   wenn Sie die Taste mindestens einmal gedrückt haben und Validierungsfehler aufgetreten sind-->
               <div *ngIf="firstSubmitted && usernameField.errors">
                 <p *ngIf="usernameField.errors.required" class="error">Required field</p>
                 <p *ngIf="usernameField.errors.minlength" class="error">Not less than 6 characters</p>
@@ -46,7 +46,7 @@
             </div>
             <div class="col-md-6 col-sm-12">
 
-              <!--              если хотя бы 1 раз нажали кнопку и появились ошибки валидации-->
+              <!--  wenn Sie die Taste mindestens einmal gedrückt haben und Validierungsfehler aufgetreten sind-->
               <div *ngIf="firstSubmitted && passwordField.errors">
                 <div *ngIf="passwordField.errors.required" class="error">Required field</div>
                 <div *ngIf="passwordField.errors.minlength" class="error">Not less than 6 characters</div>

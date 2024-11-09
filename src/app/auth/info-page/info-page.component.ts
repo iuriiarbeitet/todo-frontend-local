@@ -2,11 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {DeviceDetectorService} from 'ngx-device-detector';
 
-/*
-
-Страница для показа текстовой информации (статуса).
-Чаще всего - результат выполнения какой-либо операции пользователя.
-
+/**
+ * Seite zur Anzeige von Textinformationen (Status).
+ * Meistens ist es das Ergebnis einer Benutzeroperation.
  */
 
 @Component({
@@ -16,24 +14,24 @@ import {DeviceDetectorService} from 'ngx-device-detector';
 })
 export class InfoPageComponent implements OnInit {
 
-  msg: string; // текст для отображения на странице
-  isMobile: boolean; // зашли на сайт с мобильного устройства или нет?
+  msg: string; // Text, der auf der Seite angezeigt werden soll
+  isMobile: boolean; // Haben Sie über ein mobiles Gerät auf die Website zugegriffen oder nicht?
 
 
-  // внедрение всех нужных объектов
+  // Umsetzung aller notwendigen Objekte
   constructor(
-    private route: ActivatedRoute, // текущий роут, куда уже перешли (можно считывать данные, например параметры)
-    private deviceService: DeviceDetectorService // с какого устойства зашли
+    private route: ActivatedRoute, // aktuelle Route, wohin Sie bereits gegangen sind (Sie können Daten, zum Beispiel Parameter, ablesen)
+    private deviceService: DeviceDetectorService // Von welchem Gerät aus haben Sie sich angemeldet?
 
   ) {
   }
 
-  ngOnInit(): void { // вызывается при инициализации компонента (до отображения внешнего вида)
+  ngOnInit(): void { // Wird aufgerufen, wenn die Komponente initialisiert wird (bevor das Erscheinungsbild gerendert wird)
 
     this.isMobile = this.deviceService.isMobile();
 
-    // считываем из параметра переданный текст для его отображения на странице
-    this.route.params.subscribe(params => { // т.к. params - это Observable - подписываемся и получаем значения
+    // Wir lesen den übergebenen Text aus dem Parameter, um ihn auf der Seite anzuzeigen
+    this.route.params.subscribe(params => {
       this.msg = params.msg;
     });
 

@@ -3,10 +3,8 @@ import {HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from '@angular/com
 import {Observable} from 'rxjs';
 
 
-/*
-
-Interceptor - перехватывает все исходящие запросы - можно изменять данные перед отправкой
-
+/**
+ * Interceptor – fängt alle ausgehenden Anfragen ab – Sie können Daten vor dem Senden ändern
  */
 @Injectable()
 export class RequestInterceptor implements HttpInterceptor {
@@ -14,41 +12,30 @@ export class RequestInterceptor implements HttpInterceptor {
   constructor() {
   }
 
-// метод будет выполняться при каждом исходящем запросе на backend
+// Die Methode wird bei jeder ausgehenden Anfrage an das Backend ausgeführt
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
-
     request = request.clone({
-      withCredentials: true // разрешить отправку куков на backend
+      withCredentials: true // Ermöglichen Sie das Senden von Cookies an das Backend
     });
-
-
-
     console.log(request);
 
+    // Wenn der Benutzer ein neues Passwort eingegeben und an das Backend gesendet hat, fügen wir das Token manuell hinzu
+    if (request.url.includes('update-password')) {
+      // Wenn die Anforderung darin besteht, das Passwort zu aktualisieren, gibt es ein spezielles Passwort dafür. Token-Verarbeitung
 
-
-    // когда пользователь ввел новый пароль и отправил его на backend - тогда мы вручную добавляем токен
-    if (request.url.includes('update-password')) {  // если запрос идет на обновление пароля - для него спец. обработка токена
-
-      const token = request.params.get('token'); // получаем токен из параметра запроса
-      request.params.delete('token');   // удаляем параметр, т.к. он больше не нужен
+      const token = request.params.get('token'); // Holen Sie sich das Token aus dem Anforderungsparameter
+      request.params.delete('token');   // Wir löschen den Parameter, weil er wird nicht mehr benötigt
 
       request = request.clone({
         setHeaders: ({
-          // добавляем токен в заголовок Authorization (не используем кук, этот токен будет отправлен на сервер только 1 раз,
-          // чтобы выполнить обновление пароля)
+          // Fügen Sie dem Authorization-Header ein Token hinzu (wir verwenden kein Cookie,
+          // dieses Token wird nur einmal an den Server gesendet, um Ihr Passwort zu aktualisieren)
           Authorization: 'Bearer ' + token
         })
       });
     }
 
-    return next.handle(request); // отправляем исходящий запрос дальше на backend
-
-
+    return next.handle(request); // Senden Sie die ausgehende Anfrage weiter an das Backend
   }
-
-
-
-
 }

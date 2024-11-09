@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {AbstractControl, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {AuthService, User} from '../service/auth.service';
 import {Router} from '@angular/router';
 import {DeviceDetectorService} from 'ngx-device-detector';
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -10,41 +11,38 @@ import {DeviceDetectorService} from 'ngx-device-detector';
 })
 export class LoginComponent implements OnInit {
 
-  form: FormGroup; // форма с введенными пользователем данными
-  user: User; // данные пользователя после того, как успешно залогинится
-  error: string; // текст ошибки (если есть) - возвращается от backend
-  firstSubmitted = false; // становится true при первом нажатии (чтобы сразу не показывать ошибки полей, а только после нажатия Войти)
-  isLoading = false; // идет ли загрузка в данный момент (для показа/скрытия индикатора загрузки)
-  showResendLink = false; // показать или нет ссылку для повторной отправки письма активации
-  isMobile: boolean; // зашли на сайт с мобильного устройства или нет?
+  form: FormGroup; // Formular mit Benutzereingaben
+  user: User; // Benutzerdaten nach erfolgreicher Anmeldung
+  error: string; // Fehlertext (falls vorhanden) – vom Backend zurückgegeben
+  // wird beim ersten Klick wahr (damit Feldfehler nicht sofort angezeigt werden, sondern erst nach dem Klicken auf die Eingabetaste)
+  firstSubmitted = false;
+  isLoading = false; // ob der Laden gerade läuft (um den Laden-Indikator anzuzeigen/auszublenden)
+  showResendLink = false; // Sie können einen Link zum erneuten Versenden des Aktivierungsschreibens anzeigen oder nicht
+  isMobile: boolean; // Haben Sie über ein mobiles Gerät auf die Website zugegriffen oder nicht?
 
 
-
-  // внедрение всех нужных объектов
+  // Umsetzung aller notwendigen Objekte
   constructor(
-    private formBuilder: FormBuilder, // для создание формы
-    private authService: AuthService, // сервис аутентификации
-    private router: Router, // для навигации, перенаправления на другие страницы
-    private deviceService: DeviceDetectorService, // для определения типа устройства
-
+    private formBuilder: FormBuilder, // um ein Formular zu erstellen
+    private authService: AuthService, // Authentifizierungsdienst
+    private router: Router, // zur Navigation, Weiterleitung zu anderen Seiten
+    private deviceService: DeviceDetectorService, // um den Gerätetyp zu bestimmen
   ) {
   }
 
-  // автоматически вызывается при создании компонента LoginComponent
+  // Wird automatisch aufgerufen, wenn die Anmeldekomponente erstellt wird
   ngOnInit(): void {
-
     this.isMobile = this.deviceService.isMobile();
 
-    // инициализация формы с нужными полями, начальными значениями и валидаторами
+    // Initialisieren des Formulars mit den erforderlichen Feldern, Anfangswerten und Validatoren
     this.form = this.formBuilder.group({
-        username: ['', [Validators.required, Validators.minLength(6)]], // Validators.required - проверка на обязательность заполнения
+        username: ['', [Validators.required, Validators.minLength(6)]],
         password: ['', [Validators.required, Validators.minLength(6)]],
       }
     );
-
   }
 
-  // быстрый доступ на компоненты формы (для сокращения кода, чтобы каждый раз не писать this.form.get('') )
+  // schneller Zugriff auf Formularkomponenten (um den Code zu kürzen, damit nicht jedes Mal this.form.get('') geschrieben werden muss)
   get usernameField(): AbstractControl {
     return this.form.get('username');
   }
@@ -52,85 +50,59 @@ export class LoginComponent implements OnInit {
   get passwordField(): AbstractControl {
     return this.form.get('password');
   }
-
-
-  // попытка отправки данных формы аутентификации
+  // Versuchen Sie, Authentifizierungsformulardaten zu übermitteln
   public submitForm(): void {
 
-    this.firstSubmitted = true; // один раз нажали на отправку формы (можно теперь показывать ошибки)
+    this.firstSubmitted = true; // einmal angeklickt, um das Formular abzusenden (Sie können jetzt Fehler anzeigen)
 
-    if (this.form.invalid) { // если есть хотя бы одна ошибка в введенных данных формы
-      return; // не отправляем данные на сервер
+    if (this.form.invalid) { // wenn mindestens ein Fehler in den eingegebenen Formulardaten vorliegt
+      return; // Wir senden keine Daten an den Server
     }
+    this.isLoading = true; // Zeigt die Ladeanzeige an
 
-    this.isLoading = true; // отображает индикатор загрузки
-
-    // объект для отправки на сервер (добавляется в тело запроса)
+    // Objekt, das an den Server gesendet werden soll (zum Anfragetext hinzugefügt)
     const tmpUser = new User();
-    tmpUser.username = this.usernameField.value; // берем введенное значение пользователя
+    tmpUser.username = this.usernameField.value; // Nimm den vom Benutzer eingegebenen Wert
     tmpUser.password = this.passwordField.value;
 
-
-    // отправка запроса на сервер
-    this.authService.login(tmpUser).subscribe( // подписываемся на результат работы backend
-      result => { // запрос успешно выполнился без ошибок (значит пользователь ввел верные логин-пароль)
-
-        this.isLoading = false; // скрывает индикатор загрузки
-
-        /*
-        Пароль передается только 1 раз при аутентификации и не сохраняется в jwt.
-        При каждой успешной аутентификации - на бэкенде генерируется новый jwt
+    // Senden einer Anfrage an den Server
+    this.authService.login(tmpUser).subscribe( // Abonnieren Sie das Ergebnis der Backend-Arbeit
+      result => { // Die Anfrage wurde erfolgreich und ohne Fehler abgeschlossen (das bedeutet,
+        // dass der Benutzer einen falschen Benutzernamen und ein falsches Passwort eingegeben hat).
+        this.isLoading = false;
+        /**
+         * Das Passwort wird bei der Authentifizierung nur einmal übermittelt und nicht in jwt gespeichert.
+         * Bei jeder erfolgreichen Authentifizierung wird im Backend ein neues JWT generiert
+         * Notiz:
+         * Die Benutzerdaten befinden sich nicht im JWT (Nutzlast), sondern einfach als Teil des JSON (nicht des codierten Benutzerfelds).
+         * Innerhalb von jwt haben wir nur den Benutzernamen und andere Systemwerte nach Bedarf (Ablauf usw.).
          */
-
-
-        // примечание:
-        // - данные пользователя находятся не внутри jwt (payload), а просто в составе JSON (не закодированное поле user)
-        // - внутри jwt у нас только username и другие системные значения по необходимости (expiration и пр.)
-
-        this.user = result; // получаем пользователя из JSON и сохраняем в память приложения (в переменную)
-
-
-        // сохраняем пользователя в сервисе, чтобы к переменной можно было обращаться из любого места и получать данные пользователя
+        this.user = result; // Rufen Sie den Benutzer aus JSON ab und speichern Sie ihn im Anwendungsspeicher (in einer Variablen).
+        // Wir speichern den Benutzer im Dienst, sodass von überall auf die Variable zugegriffen werden kann
+        // und Benutzerdaten empfangen werden können
         this.authService.currentUser.next(this.user);
-        this.authService.isLoggedIn = true; // индикатор, что пользователь успешно залогинился
-
-
-        this.router.navigate(['main']); // переходим на страницу с бизнес данными
-
-
+        this.authService.isLoggedIn = true; // Indikator dafür, dass sich der Benutzer erfolgreich angemeldet hat
+        this.router.navigate(['main']); // Gehen Sie zur Seite mit Geschäftsdaten
       },
-      err => { // запрос выполнился с ошибкой (можем использовать переменную err)
-
-        this.isLoading = false; // скрывает индикатор загрузки
-
-
-        switch (err.error.exception) { // считываем тип ошибки, чтобы правильно среагировать
-
-          case 'BadCredentialsException': { // пользователь неверно ввел логин-пароль
-            this.error = `Error: check your login or password.`; // будет показана ошибка на странице
+      err => {
+        this.isLoading = false;
+        switch (err.error.exception) {// Den Fehlertyp lesen, um richtig zu reagieren
+          case 'BadCredentialsException': { // Der Benutzer hat das Anmeldekennwort falsch eingegeben
+            this.error = `Error: check your login or password.`;
             break;
           }
-
-          case 'DisabledException': { // пользователь верно ввел логин-пароль, но его пользователь еще не активирован
-            this.error = `User not activated`; // будет показана ошибка на странице
-            this.showResendLink = true; // показать ссылку для повторной отправки письма активации
+          // Der Benutzer hat das Login-Passwort korrekt eingegeben, sein Benutzer wurde jedoch noch nicht aktiviert
+          case 'DisabledException': {
+            this.error = `User not activated`;
+            this.showResendLink = true; // Zeigt einen Link zum erneuten Versenden der Aktivierung E-Mail an
             break;
           }
-
-
-          default: { // если любой другой тип ошибки - просто показать информацию
-            this.error = `Error (please contact your administrator)`; // будет показана ошибка на странице
+          default: {
+            this.error = `Error (please contact your administrator)`;
             break;
           }
-
         }
-
-
       }
     );
-
-
   }
-
-
 }
