@@ -5,11 +5,9 @@ import {AuthService} from '../service/auth.service';
 import {DeviceDetectorService} from 'ngx-device-detector';
 
 
-/*
-
+/**
 Страница, при переходе на которую производится активация аккаунта.
 Эту страницу пользователь открывает по ссылке из письма - соответственно сразу нужно отправлять запрос активации на сервер.
-
  */
 
 @Component({
@@ -48,19 +46,15 @@ export class ActivateAccountComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]] // Validators.email - проверка правильности введенного email
     });
 
-
     // при загрузке страницы - сразу отправляем запрос на активацию пользователя
     this.route.params.subscribe(params => { // т.к. params - это Observable - подписываемся и получаем значения
       this.uuid = params.uuid; // считываем uuid пользователя, которого хотим активировать
-
 
       if (this.uuid === 'error'){
         this.showResendLink = true;
         return;
       }
-
       this.isLoading = true; // показать индикатор загрузки
-
 
       // отправка запроса на сервер
       this.authService.activateAccount(this.uuid).subscribe(
@@ -77,7 +71,6 @@ export class ActivateAccountComponent implements OnInit {
           }
 
         }
-
         ,
         err => { // запрос выполнился с ошибкой (можем использовать переменную err)
 
@@ -92,14 +85,9 @@ export class ActivateAccountComponent implements OnInit {
               break;
             }
 
-            // case 'UsernameNotFoundException': { // пользователь или email не был найден
-            //   this.error = 'Ошибка активации'; // будет показана ошибка на странице
-            //   break;
-            // }
-
-            default: { // если любой другой тип ошибки - просто показать информацию
+            default: {
               this.error = `Activation error. Try sending yourself the email again.`;
-              this.showResendLink = true; // показать ссылку на повторную отправку письма активации
+              this.showResendLink = true;
               break;
             }
 
