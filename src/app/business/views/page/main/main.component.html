@@ -1,0 +1,156 @@
+
+<div class="spinner" *ngIf="spinner && spinner.visibility | async"></div>
+
+
+<ng-sidebar-container *ngIf="!isLoading"> <!--контейнер для внедрения слайд-меню-->
+
+  <!--  слайд-меню-->
+  <ng-sidebar
+
+    [opened]="menuOpened"
+    [closeOnClickOutside]="false"
+    [closeOnClickBackdrop]="true"
+    [showBackdrop]="showBackdrop"
+    [mode]="menuMode"
+    [animate]="true"
+    [position]="menuPosition"
+    [autoFocus]="false"
+
+
+  >
+
+
+    <!--
+                 как правильно локализовывать компонент intro.js в HTML
+                 https://github.com/usablica/intro.js/issues/693-->
+
+    <div class="sidebar"
+         data-color="purple"
+         data-step="1"
+         [attr.data-intro]=" 'HELP.FILTER-TASKS' | translate "
+         data-position='right'
+    >
+
+      <!--    список категорий-->
+      <app-categories
+
+
+        [categories]="categories"
+        [selectedCategory]="selectedCategory"
+        [user]="user"
+        [categorySearchValues]="categorySearchValues"
+        [stat]="stat"
+
+
+
+        (addCategoryEvent)="addCategory($event)"
+        (updateCategoryEvent)="updateCategory($event)"
+        (deleteCategoryEvent)="deleteCategory($event)"
+        (searchCategoryEvent)="searchCategory($event)"
+        (toggleMenuEvent)="toggleMenu()"
+        (selectCategoryEvent)="selectCategory($event)"
+
+
+      ></app-categories>
+
+
+    </div>
+
+  </ng-sidebar>
+
+
+  <!--  основной контент-->
+  <!--  ng-sidebar-content - над чем будет открываться слайд-меню-->
+  <div ng-sidebar-content>
+
+    <div class="main-panel wrapper" [ngClass]="{'mobile-background': isMobile}">
+
+
+      <!--    навигация с шапкой и списком категорий-->
+
+      <nav class="navbar navbar-transparent navbar-absolute fixed-top navbar-expand"
+           [ngClass]="{'mobile-action-bar': isMobile}">
+
+        <!--     шапка с меню -->
+        <app-header
+          [categoryName]="selectedCategory ? selectedCategory.title: 'All'"
+          [user]="user"
+          [showStat]="showStat"
+          [showMobileSearch]="showSearch"
+
+
+
+          (settingsChangedEvent)="settingsChanged($event)"
+          (toggleMenuEvent)="toggleMenu()"
+          (toggleStatEvent)="toggleStat($event)"
+          (toggleMobileSearchEvent)="toggleSearch($event)"
+
+        >
+
+        </app-header>
+
+
+      </nav>
+
+
+      <div class="content">
+        <div class="container-fluid nopadding">
+
+
+          <!-- статистика -->
+          <app-stat *ngIf="!isMobile"
+
+                    [dash]="dash"
+                    [showStat]="showStat"
+          >
+
+          </app-stat>
+
+
+
+
+
+          <!--        список задач-->
+          <app-tasks
+
+            (updateTaskEvent)="updateTask($event)"
+            (deleteTaskEvent)="deleteTask($event)"
+            (addTaskEvent)="addTask($event)"
+            (pagingEvent)="paging($event)"
+            (toggleSearchEvent)="toggleSearch($event)"
+            (searchActionEvent)="searchTasks($event)"
+
+
+            [showSearch]="showSearch"
+            [tasks]="tasks"
+            [priorities]="priorities"
+            [categories]="categories"
+            [selectedCategory]="selectedCategory"
+            [taskSearchValues]="taskSearchValues"
+            [user]="user"
+            [totalTasksFounded]="totalTasksFound"
+
+          >
+
+          </app-tasks>
+
+
+        </div>
+
+      </div>
+
+
+      <div *ngIf="!isMobile">
+        <!--    нижняя часть страницы (футер, подвал) -->
+        <app-footer></app-footer>
+
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+</ng-sidebar-container>

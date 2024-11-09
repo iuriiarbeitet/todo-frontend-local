@@ -1,0 +1,123 @@
+{
+  "HELP": {
+    "FILTER-TASKS": "Aufgaben filtern, Kategorien hinzufügen/entfernen/bearbeiten",
+    "STAT": "Statistik der Aufgabenerledigung in der ausgewählten Kategorie",
+    "TASKS-LIST": "Liste aller Aufgaben mit Bearbeitungsmöglichkeit",
+    "NEXT": "Nächste",
+    "PREV": "Zurück",
+    "EXIT": "Ausfahrt",
+    "SETTINGS": "EINSTELLUNGEN"
+  },
+  "COMMON": {
+    "CANCEL": "Stornieren",
+    "NAME-20SYMBOLS": "",
+    "SAVE": "Speichern",
+    "DELETE": "Löschen",
+    "CLOSE": "Schließen",
+    "NOT-FOUND": "Nichts gefunden",
+    "OUR-SITE": "Unsere Website",
+    "ABOUT": "Über die Anwendung",
+    "BLOG": "Blog",
+    "PROJECT-DESC": "Entwickelt von Iurii Rotari – To-Do-Listen-App",
+    "CATEGORY": "Kategorie",
+    "NAME": "Name",
+    "PRIORITY": "Priorität",
+    "SORT": "Sortierfeld",
+    "CONFIRM": "Aktion bestätigen",
+    "SETTINGS": "Einstellungen",
+    "HELP": "Helfen",
+    "EXIT": "Ausfahrt",
+    "ACCOUNT": "Konto"
+  },
+  "PRIORITY": {
+    "NAME-20SYMBOLS": "Titel (20 Zeichen)",
+    "ADD": "Priorität hinzufügen",
+    "ALL": "Alle Prioritäten",
+    "CONFIRM-DELETE": "Möchten Sie die Priorität wirklich entfernen \"{{name}}\" ? (Aufgaben erhalten den Wert „Keine Priorität“)",
+    "ADDING": "Zusatz",
+    "EDITING": "Bearbeitung"
+  },
+  "TASKS": {
+    "NAME-REQUIRED": "Titel (erforderlich)",
+    "SELECT-CATEGORY": "Kategorie auswählen",
+    "WITHOUT-CATEGORY": "Nicht kategorisiert",
+    "SELECT-PRIORITY": "Wählen Sie Priorität aus",
+    "WITHOUT-PRIORITY": "Keine Priorität",
+    "SELECT-DATE": "Geben Sie das Fälligkeitsdatum an",
+    "TODAY": "Heute",
+    "TOMORROW": "Morgen",
+    "AFTER-TOMORROW": "Übermorgen",
+    "AFTER-WEEK": "In einer Woche",
+    "COMPLETE-TASK": "Vollständig ",
+    "ACTIVATE-TASK": "Aktivieren",
+    "DELETE-TASK": "Löschen",
+    "ALL": "Alle Aufgaben",
+    "COMPLETED": "Vollendet",
+    "NOT-COMPLETED": "Unvollendet",
+    "FILTER-STATUS": "Status",
+    "FILTER-PRIORITY": "Priorität",
+    "NAME": "Name",
+    "DATE": "Datum",
+    "SORT-DIRECTION": "Sortierrichtung",
+    "ADD": "Hinzufügen",
+    "FOUNDED": "Aufgaben gefunden",
+    "PRIORITY": "Priorität",
+    "CATEGORY": "Kategorie",
+    "SHOW-HIDE-SEARCH": "Suche ein-/ausblenden",
+    "HIDE-SEARCH": "Suche schließen",
+    "RESET": "Suche zurücksetzen",
+    "CONFIRM-DELETE": "Möchten Sie die Aufgabe wirklich löschen? \"{{name}}\" ?",
+    "WITHOUT-DATE": "Keine Frist",
+    "YESTERDAY": "Gestern",
+    "ADDING": "Eine Aufgabe hinzufügen",
+    "EDITING": "Bearbeitung",
+    "DATE-FROM": "Datum (Beginn)",
+    "DATE-TO": "Datum (Ende)",
+    "SEARCH-TIP": "Die Suche erfolgt nach Kategorie"
+  },
+  "SETTINGS": {
+    "PRIORITY": "Prioritäten",
+    "LANG": "Sprache"
+  },
+  "LANG": {
+    "SELECT": "Sprache auswählen",
+    "EN": "Английский",
+    "DE": "Deutsch"
+  },
+  "CATEGORY": {
+    "CATEGORIES": "Kategorien",
+    "SEARCH": "Kategorien durchsuchen",
+    "ALL": "Alle Aufgaben",
+    "CONFIRM-DELETE": "Möchten Sie die Kategorie wirklich löschen \"{{name}}\" ? (Aufgaben erhalten den Wert „Nicht kategorisiert“)",
+    "ADDING": "Zusatz",
+    "EDITING": "Bearbeitung"
+  },
+  "STAT": {
+    "SHOW-HIDE": "Statistiken ein-/ausblenden",
+    "COMPLETED": "Abgeschlossene Aufgaben",
+    "NOT-COMPLETED": "Unerledigte Aufgaben",
+    "COMPLETED-PERCENT": "% erledigte Aufgaben",
+    "NOT-COMPLETED-PERCENT": "% unerledigte Aufgaben"
+  },
+  "PAGING": {
+    "PAGE-SIZE": "Menge pro Seite",
+    "PREV": "Vorherige Seite",
+    "NEXT": "Nächste Seite",
+    "LAST": "Letzte Seite",
+    "FIRST": "Erste Seite",
+    "OF": "aus"
+  },
+
+  "AUTH": {
+    "ENTER": "Login",
+    "PREV": "Vorherige Seite",
+    "NEXT": "Nächste Seite",
+    "LAST": "Letzte Seite",
+    "FIRST": "Erste Seite",
+    "OF": "aus"
+  },
+
+  "PROFILE": {
+    "TITLE": "Profil"
+  }
+}
