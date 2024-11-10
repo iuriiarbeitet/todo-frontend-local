@@ -1,4 +1,4 @@
-<!--область страницы с категориями-->
+<!-- Bereich der Kategorieseite -->
 
 <div id="categories">
 
@@ -13,27 +13,20 @@
             <mat-icon>keyboard_arrow_left</mat-icon>
           </button>
 
-
         </div>
 
         <div class="col-8 ">
-
           <p class="nav-title">{{'CATEGORY.CATEGORIES' | translate}}</p>
-
-
         </div>
 
-
-        <!--    иконка добавления новой категории для полной версии-->
-
+        <!--    Symbol zum Hinzufügen einer neuen Kategorie für die Vollversion -->
         <div class="col-2 align-self-center text-center nopadding nomargin">
           <button mat-icon-button (click)="openAddDialog()">
             <mat-icon>add</mat-icon>
           </button>
-
         </div>
 
-        <!--    иконка добавления новой категории для моб. версии-->
+
 <!--        <div class="col-12 text-center" *ngIf="isMobile">-->
 <!--          <button  class="add-icon">-->
 <!--            + Add-->
@@ -45,27 +38,13 @@
     </div>
   </div>
 
-
   <div class="sidebar-wrapper">
-
-
     <ul class="nav">
 
-
-      <!--      поиск категорий -->
-
-
+      <!--      Kategorie suche -->
       <div class="search-category-area">
-
         <mat-form-field class="example-full-width">
-
-
-          <input
-
-            matInput
-            maxlength="15"
-            placeholder="{{'CATEGORY.SEARCH' | translate}}"
-
+          <input matInput maxlength="15" placeholder="{{'CATEGORY.SEARCH' | translate}}"
             [(ngModel)]="searchTitle"
 
             (ngModelChange)="this.checkFilterChanged()"
@@ -74,71 +53,39 @@
             (keyup.delete)="checkEmpty()"
 
             (keydown.escape)="clearAndSearch()"
-
           />
-
-          <button
-            *ngIf="searchTitle && searchTitle.trim().length > 0"
-
-            matSuffix
-            mat-icon-button
-
-
-            class="search-category-button"
-
-
-            (click)="clearAndSearch()"
-          >
+          <button *ngIf="searchTitle && searchTitle.trim().length > 0" matSuffix mat-icon-button class="search-category-button"
+            (click)="clearAndSearch()">
             <mat-icon>clear</mat-icon>
           </button>
 
-
-          <button
-            *ngIf="searchTitle && searchTitle.trim().length > 0"
-
-
-            matSuffix
-            mat-icon-button
-
+          <button *ngIf="searchTitle && searchTitle.trim().length > 0" matSuffix mat-icon-button
             (click)="search()"
-
-            [ngClass]="{'blink-button': filterChanged}"
-
-          >
+            [ngClass]="{'blink-button': filterChanged}">
             <mat-icon>search</mat-icon>
           </button>
 
-
-
         </mat-form-field>
-
       </div>
 
-      <!-- виртуальная категория 'Все'-->
+      <!-- virtuelle Kategorie „Alle“ -->
       <li class="nav-item category" [class.active]="selectedCategory == null"
-          (click)="showCategory(null)"
-
-      >
-
+          (click)="showCategory(null)">
         <a class="nav-link">
-
-          <!--          название категории  Все -->
+          <!--  Kategoriename Alle -->
           <span class="all-category-title">{{'CATEGORY.ALL' | translate}}</span>
-
-
-          <!--сколько невыполненных задач-->
+          <!--wie viele unerledigte Aufgaben-->
           <span class="uncompleted-count" *ngIf="stat"> {{stat.uncompletedTotal || 0}}</span>
-
         </a>
       </li>
 
-      <!-- разделитель-->
+      <!-- Separator-->
       <div class="line"></div>
 
       <div *ngIf="!categories || categories.length === 0"><p class="not-found">{{'COMMON.NOT-FOUND' |
         translate}}</p></div>
 
-      <!--      список категорий-->
+      <!--      Liste der Kategorien-->
       <li
 
         *ngFor="let category of categories, let index = index"
@@ -149,32 +96,23 @@
         [class.active]="(selectedCategory && category) && (category.id === selectedCategory.id)"
         (click)="showCategory(category)"
 
-        class="nav-item category"
-      >
+        class="nav-item category">
 
         <a class="nav-link">
-
-          <!--          название категории-->
+          <!--  Kategoriename  -->
           <span class="category-title">{{category.title}}</span>
-
-
-          <!--         кнопка редактирования категории-->
+          <!--  Schaltfläche zum Bearbeiten der Kategorie -->
           <span class="edit-category-icon-area">
 
-            <mat-icon
-              *ngIf="(showEditIconCategoryIcon && index === indexCategoryMouseOver) || isMobile"
+            <mat-icon *ngIf="(showEditIconCategoryIcon && index === indexCategoryMouseOver) || isMobile"
 
               (click)="$event.stopPropagation(); openEditDialog(category)"
-
-
-              class="edit-category-icon"
-
-            >edit
+              class="edit-category-icon">edit
             </mat-icon>
 
           </span>
 
-          <!--сколько невыполненных задач (null конвертируем в цифру ноль)-->
+          <!--wie viele unerledigte Aufgaben (Null wird in die Zahl Null umgewandelt)-->
           <span class="uncompleted-count"> {{category.uncompletedCount || 0}}</span>
 
         </a>

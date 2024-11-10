@@ -1,9 +1,9 @@
-// готовые методы для работы с cookies - добавление, удаление, получение
-// напоминание - это client-side-cookie - поэтому в них нельзя хранить sensitive данные
+// vorgefertigte Methoden zum Arbeiten mit Cookies – Hinzufügen, Löschen, Empfangen
+// Reminder ist ein clientseitiges Cookie – daher können keine sensiblen Daten darin gespeichert werden
 
 export class CookieUtils {
 
-    // сохранить cookie
+    // Cookie speichern
     public setCookie(name: string, val: string): void {
         const date = new Date();
         const value = val;
@@ -15,7 +15,7 @@ export class CookieUtils {
         document.cookie = name + '=' + value + '; expires=' + date.toUTCString() + '; path=/; SameSite=Strict; Secure;';
     }
 
-    // получить cookie
+    // Cookie erhalten
     public getCookie(name: string): string {
         const value = '; ' + document.cookie;
         const parts = value.split('; ' + name + '=');
@@ -26,7 +26,7 @@ export class CookieUtils {
     }
 
 
-    // удалить cookie
+    // löschen cookie
     public deleteCookie(name: string): void {
         const date = new Date();
 

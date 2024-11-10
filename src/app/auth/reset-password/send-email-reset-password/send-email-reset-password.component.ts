@@ -1,9 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {AbstractControl, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../../service/auth.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {DeviceDetectorService} from 'ngx-device-detector';
-
 
 
 @Component({
@@ -13,83 +12,72 @@ import {DeviceDetectorService} from 'ngx-device-detector';
 })
 export class SendEmailResetPasswordComponent implements OnInit {
 
-  form: FormGroup; // форма с введенными пользователем данными
-  isLoading = false; // идет ли загрузка в данный момент (для показа/скрытия индикатора загрузки)
-  error: string; // текст ошибки от сервера (если есть)
-  firstSubmitted = false; // становится true при первом нажатии (чтобы сразу не показывать ошибки полей, а только после первой попытки)
-  isMobile: boolean; // зашли на сайт с мобильного устройства или нет?
+  form: FormGroup; // Formular mit Benutzereingaben
+  isLoading = false; // ob der Laden gerade läuft (um den Laden-Indikator anzuzeigen/auszublenden)
+  error: string; // Fehlertext vom Server (falls vorhanden)
+  firstSubmitted = false; // wird beim ersten Klick wahr (damit Feldfehler nicht sofort, sondern erst nach dem ersten Versuch angezeigt werden)
+  isMobile: boolean; // Haben Sie über ein mobiles Gerät auf die Website zugegriffen oder nicht?
 
-
-  // внедрение всех нужных объектов
+  // Umsetzung aller notwendigen Objekte
   constructor(
-    private formBuilder: FormBuilder, // для создание формы
-    private route: ActivatedRoute, // текущий роут, куда уже перешли (можно считывать данные, например параметры)
-    private router: Router, // для навигации, перенаправления на другие страницы
-    private authService: AuthService, // сервис аутентификации
-    private deviceService: DeviceDetectorService, // для определения типа устройства
+    private formBuilder: FormBuilder, // um ein Formular zu erstellen
+    private route: ActivatedRoute, // aktuelle Route, wohin Sie bereits gegangen sind (Sie können Daten, zum Beispiel Parameter, ablesen)
+    private router: Router, // zur Navigation, Weiterleitung zu anderen Seiten
+    private authService: AuthService, // Authentifizierungsdienst
+    private deviceService: DeviceDetectorService, // um den Gerätetyp zu bestimmen
 
   ) {
   }
 
-  ngOnInit(): void { // вызывается при инициализации компонента (до отображения внешнего вида)
+  ngOnInit(): void { // Wird aufgerufen, wenn die Komponente initialisiert wird (bevor das Erscheinungsbild gerendert wird)
 
     this.isMobile = this.deviceService.isMobile();
 
-    // инициализация формы с нужными полями, начальными значениями и валидаторами
+    // Initialisieren des Formulars mit den erforderlichen Feldern, Anfangswerten und Validatoren
     this.form = this.formBuilder.group({
-      email: ['', [Validators.required, Validators.email]] // Validators.email - проверка правильности введенного email
+      email: ['', [Validators.required, Validators.email]]
     });
-
-
   }
 
-  // ссылка на компонент формы (для сокращения кода, чтобы каждый раз не писать this.form.get('') )
+  // Verweis auf die Formularkomponente (um den Code zu kürzen, damit nicht jedes Mal this.form.get('') geschrieben werden muss)
   get emailField(): AbstractControl {
     return this.form.get('email');
   }
 
-  // попытка отправки данных формы
+  // Versuchen Sie, Formulardaten zu übermitteln
   public submitForm(): void {
 
-    this.firstSubmitted = true; // один раз нажали на отправку формы (теперь можно показывать ошибки)
+    this.firstSubmitted = true; // einmal angeklickt, um das Formular abzusenden (jetzt können Sie Fehler anzeigen)
 
-    if (this.form.invalid) { // если есть хотя бы одна ошибка в введенных данных формы
+    if (this.form.invalid) { // wenn mindestens ein Fehler in den eingegebenen Formulardaten vorliegt
       return; // не отправляем данные на сервер
     }
-
-
-    this.isLoading = true; // показать индикатор загрузки
+    this.isLoading = true; // Ladeanzeige anzeigen
 
     // отправка запроса на сервер
     this.authService.sendResetPasswordEmail(this.emailField.value).subscribe(
-      () => { // запрос успешно выполнился без ошибок
+      () => { // Die Anfrage wurde erfolgreich und ohne Fehler ausgeführt
 
-        this.isLoading = false; // скрыть индикатор загрузки
+        this.isLoading = false;
 
-        // показываем пользователю информацию на новой странице
+        // Zeigt die Benutzerinformationen auf einer neuen Seite an
         this.router.navigate(['/info-page', {msg: 'You have been sent a letter to reset your password, check your email in 1-2 minutes.'}]);
       },
 
-      err => { // запрос выполнился с ошибкой (можем использовать переменную err)
-        this.isLoading = false; // скрыть индикатор загрузки
+      err => {
+        this.isLoading = false;
 
-        switch (err.error.exception) { // считываем тип ошибки, чтобы правильно среагировать
-
-          case 'UsernameNotFoundException': { // пользователь или email не был найден
-            this.error = `There is no user registered with this email address.`; // будет показана ошибка на странице
+        switch (err.error.exception) { // Wir lesen den Fehlertyp aus, um richtig reagieren zu können
+          case 'UsernameNotFoundException': { // Benutzer oder E-Mail wurde nicht gefunden
+            this.error = `There is no user registered with this email address.`;
             break;
           }
-
-          default: { // если любой другой тип ошибки - просто показать информацию
-            this.error = `Error`; // будет показана ошибка на странице
+          default: {
+            this.error = `Error`;
             break;
           }
-
         }
-
       });
 
   }
-
-
 }

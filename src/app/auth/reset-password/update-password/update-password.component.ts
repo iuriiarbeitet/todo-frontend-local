@@ -12,44 +12,42 @@ import {DeviceDetectorService} from 'ngx-device-detector';
 })
 export class UpdatePasswordComponent implements OnInit {
 
-  form: FormGroup; // форма с введенными пользователем данными
-  isLoading = false; // идет ли загрузка в данный момент (для показа/скрытия индикатора загрузки)
-  error: string; // текст ошибки (если есть)
-  showPasswordForm = false; // показывать ли форму с паролями
-  token: string; // токен для отправки запроса на сервер
-  firstSubmitted = false; // становится true при первом нажатии (чтобы сразу не показывать ошибки полей, а только после первой попытки)
-  isMobile: boolean; // зашли на сайт с мобильного устройства или нет?
+  form: FormGroup; // Formular mit Benutzereingaben
+  isLoading = false; // ob der Laden gerade läuft (um den Laden-Indikator anzuzeigen/auszublenden)
+  error: string; // Fehlertext vom Server (falls vorhanden)
+  showPasswordForm = false; // ob das Formular mit Passwörtern angezeigt werden soll
+  token: string; // Token zum Senden einer Anfrage an den Server
+  firstSubmitted = false; // wird beim ersten Klick wahr (damit Feldfehler nicht sofort, sondern erst nach dem ersten Versuch angezeigt werden)
+  isMobile: boolean; // Haben Sie über ein mobiles Gerät auf die Website zugegriffen oder nicht?
 
 
-  // внедрение всех нужных объектов
+  // Umsetzung aller notwendigen Objekte
   constructor(private formBuilder: FormBuilder,
               private route: ActivatedRoute,
               private router: Router,
               private authService: AuthService,
-              private deviceService: DeviceDetectorService, // для определения типа устройства
+              private deviceService: DeviceDetectorService, // um den Gerätetyp zu bestimmen
   ) {
   }
 
-  ngOnInit(): void { // вызывается при инициализации компонента (до отображения внешнего вида)
+  ngOnInit(): void { // Wird aufgerufen, wenn die Komponente initialisiert wird (bevor das Erscheinungsbild gerendert wird)
 
     this.isMobile = this.deviceService.isMobile();
 
-
-    // инициализация формы с нужными полями, начальными значениями и валидаторами
+    // Initialisieren des Formulars mit den erforderlichen Feldern, Anfangswerten und Validatoren
     this.form = this.formBuilder.group({
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required, Validators.minLength(6)]]
     });
 
-
-    this.route.params.subscribe(params => { // т.к. params - это Observable - подписываемся и получаем значения
-      this.token = params.token; // считываем токен из параметра роута
-      this.showPasswordForm = true; // показываем форму с паролями только после получения token из параметра запроса
+    this.route.params.subscribe(params => { // Weil params ist ein Observable – wir abonnieren und erhalten die Werte
+      this.token = params.token; // Lesen Sie das Token aus dem Routenparameter
+      this.showPasswordForm = true; // Zeigen Sie das Formular mit Passwörtern erst an, nachdem Sie das Token vom Anforderungsparameter erhalten haben
     });
 
   }
 
-  // ссылка на компоненты формы (для сокращения кода, чтобы каждый раз не писать this.form.get('') )
+  // Verweis auf Formularkomponenten (um den Code zu kürzen, damit nicht jedes Mal this.form.get('') geschrieben werden muss)
   get passwordField(): AbstractControl  {
     return this.form.get('password');
   }
@@ -58,37 +56,34 @@ export class UpdatePasswordComponent implements OnInit {
     return this.form.get('confirmPassword');
   }
 
-  // попытка отправки данных формы
+  // Versuchen Sie, Formulardaten zu übermitteln
   public submitForm(): void {
 
-    this.firstSubmitted = true; // один раз нажали на отправку формы (можно теперь показывать ошибки)
+    this.firstSubmitted = true; // einmal angeklickt, um das Formular abzusenden (Sie können jetzt Fehler anzeigen)
 
-    if (this.form.invalid) { // если есть хотя бы одна ошибка в введенных данных формы
-      return; // не отправляем данные на сервер
+    if (this.form.invalid) { // wenn mindestens ein Fehler in den eingegebenen Formulardaten vorliegt
+      return; // Senden Sie keine Daten an den Server
     }
 
+    this.isLoading = true; // Ladeanzeige anzeigen
 
-    this.isLoading = true; // показать индикатор загрузки
-
-    // отправка запроса на сервер
+    // Senden einer Anfrage an den Server
     this.authService.updatePassword(this.passwordField.value, this.token).subscribe(
-      result => { // запрос успешно выполнился без ошибок
+      result => { // Die Anfrage wurde erfolgreich und ohne Fehler ausgeführt
 
-        this.isLoading = false; // скрыть индикатор загрузки
+        this.isLoading = false; // Ladeanzeige ausblenden
 
         if (result) {
           this.router.navigate(['/info-page', {msg: 'Password updated successfully.'}]);
         }
-
       },
 
-      () => { // от сервера пришла ошибка
-        this.isLoading = false; // скрыть индикатор загрузки
+      () => { // Es ist ein Fehler vom Server aufgetreten
+        this.isLoading = false; // Ladeanzeige ausblendenи
 
-        // показываем пользователю информацию на новой странице
+        // Zeigt die Benutzerinformationen auf einer neuen Seite an
         this.router.navigate(['/info-page', {msg: 'Error updating password. The page may have expired. Request password again.'}]);
 
       });
-
   }
 }

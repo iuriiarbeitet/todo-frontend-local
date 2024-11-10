@@ -12,7 +12,7 @@ import {PageEvent} from '@angular/material/paginator';
 import {AbstractControl, FormControl, FormGroup} from '@angular/forms';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {Category} from '../../../model/Category';
-import { Task } from 'src/app/business/model/Task';
+import {Task} from 'src/app/business/model/Task';
 import {Priority} from '../../../model/Priority';
 
 
@@ -22,7 +22,6 @@ import {Priority} from '../../../model/Priority';
   styleUrls: ['./tasks.component.css'],
 
   animations: [
-
 
     trigger('searchRegion', [
       state('show', style({
@@ -36,75 +35,62 @@ import {Priority} from '../../../model/Priority';
         height: '0px',
       })),
 
-
       transition('* => *', animate('300ms ease-in-out'))
-
     ])
-
-
   ]
-
-
 })
 
-// "presentational component": отображает полученные данные и отправляет какие-либо действия обработчику
-// назначение - работа со списком задач
+// "presentational component": zeigt die empfangenen Daten an und sendet alle Aktionen an den Handler
+// Zweck - Arbeiten mit einer Liste von Aufgaben
 export class TaskListComponent implements OnInit {
 
-
-  // ----------------------- входящие параметры ----------------------------
-
-
-  // переменные для настройки постраничности должны быть проинициализированы первыми (до обновления tasks)
-  // чтобы компонент постраничности правильно отработал
-
+  // ------------- Eingehende Parameter -----------------------
+  // Variablen zum Einrichten der Paginierung müssen zuerst initialisiert werden (vor der Aktualisierung von Aufgaben)
+  // damit die Paginierungskomponente korrekt funktioniert
 
   @Input()
-  totalTasksFounded: number; // сколько всего задач найдено
+  totalTasksFounded: number; // Wie viele Probleme wurden gefunden?
 
   @Input()
-  user: User; // текущий пользователь
+  user: User; // aktueller Benutzer
 
   @Input()
-  selectedCategory: Category; // выбранная категория
+  selectedCategory: Category; // ausgewählte Kategorie
 
-
-  // задачи для отображения на странице
+  // Aufgaben, die auf der Seite angezeigt werden sollen
   @Input('tasks')
   set setTasks(tasks: Task[]) {
     this.tasks = tasks;
-    this.assignTableSource();   // передать данные таблице для отображения задач
+    this.assignTableSource();   // Übergeben Sie Daten an die Tabelle, um Aufgaben anzuzeigen
   }
 
-  // все возможные параметры для поиска задач
+  // alle möglichen Parameter für Suchaufgaben
   @Input('taskSearchValues')
   set setTaskSearchValues(taskSearchValues: TaskSearchValues) {
     this.taskSearchValues = taskSearchValues;
-    this.initSearchValues(); // записать в локальные переменные
-    this.initSortDirectionIcon(); // показать правильную иконку в поиске задач (убывание, возрастание)
+    this.initSearchValues(); // in lokale Variablen schreiben
+    this.initSortDirectionIcon(); // das richtige Icon in der Aufgabensuche anzeigen (absteigend, aufsteigend)
   }
 
-  // приоритеты для фильтрации и выбора при редактировании/создании задачи (выпадающий список)
+  // Prioritäten zum Filtern und Auswählen beim Bearbeiten/Erstellen einer Aufgabe (Dropdown-Liste)
   @Input('priorities')
   set setPriorities(priorities: Priority[]) {
     this.priorities = priorities;
   }
 
-  // категории при редактировании/создании задачи (выпадающий список)
+  // Kategorien beim Bearbeiten/Erstellen einer Aufgabe (Dropdown-Liste)
   @Input('categories')
   set setCategories(categories: Category[]) {
     this.categories = categories;
   }
 
-
   @Input('showSearch')
-  set setShowSearch(show: boolean) { // показать/скрыть инструменты поиска
+  set setShowSearch(show: boolean) { // Suchwerkzeuge ein-/ausblenden
     this.showSearch = show;
-    this.initAnimation();  // каждый раз при изменении значения - показывать анимацию скрытия/показа
+    this.initAnimation();  // Jedes Mal, wenn sich der Wert ändert, wird die Animation ein-/ausgeblendet
   }
 
-
-  // ----------------------- исходящие действия----------------------------
+  // ----------------------- ausgehende Aktionen ----------------------------
 
   @Output()
   addTaskEvent = new EventEmitter<Task>();
@@ -116,97 +102,88 @@ export class TaskListComponent implements OnInit {
   updateTaskEvent = new EventEmitter<Task>();
 
   @Output()
-  pagingEvent = new EventEmitter<PageEvent>(); // переход по страницам данных
+  pagingEvent = new EventEmitter<PageEvent>(); // Navigation durch Datenseiten
 
   @Output()
-  toggleSearchEvent = new EventEmitter<boolean>(); // показать/скрыть поиск
+  toggleSearchEvent = new EventEmitter<boolean>(); // Suche ein-/ausblenden
 
   @Output()
-  searchActionEvent = new EventEmitter<TaskSearchValues>(); // переход по страницам данных
+  searchActionEvent = new EventEmitter<TaskSearchValues>(); // Navigation durch Datenseiten
 
-  // -------------------------------------------------------------------------
 
-  priorities: Priority[]; // список приоритетов (для фильтрации задач, для выпадающих списков)
-  categories: Category[]; // список категорий
-  tasks: Task[]; // текущий список задач для отображения
+  priorities: Priority[]; // Prioritätenliste (zum Filtern von Aufgaben, für Dropdown-Listen)
+  categories: Category[]; // Liste der Kategorien
+  tasks: Task[]; // aktuelle Liste der anzuzeigenden Aufgaben
 
-  // поля для таблицы (те, что отображают данные из задачи - должны совпадать с названиями переменных класса)
+  // Felder für die Tabelle (diejenigen, die Daten aus der Aufgabe anzeigen, müssen mit den Namen der Klassen variablen übereinstimmen)
   displayedColumns: string[] = ['color', 'id', 'title', 'date', 'priority', 'category', 'operations'];
-  dataSource: MatTableDataSource<Task> = new MatTableDataSource<Task>(); // источник данных для таблицы
+  dataSource: MatTableDataSource<Task> = new MatTableDataSource<Task>(); // Datenquelle für die Tabelle
 
-
-  // значения для поиска (локальные переменные - для удобства)
+  // Zu suchende Werte (lokale Variablen – der Einfachheit halber)
   filterTitle: string;
   filterCompleted: number;
   filterPriorityId: number;
   filterSortColumn: string;
   filterSortDirection: string;
-  dateRangeForm: FormGroup; // будет содержать даты для фильтрации/поиска задач
+  dateRangeForm: FormGroup; // enthält Daten für Filter-/Suchaufgaben
 
 
-  isMobile: boolean; // зашли на сайт с мобильного устройства или нет?
+  isMobile: boolean; // Haben Sie über ein mobiles Gerät auf die Website zugegriffen oder nicht?
 
-  // параметры поиска задач - первоначально данные загружаются из cookies (в app.component)
+  // Aufgabensuchparameter – Daten werden zunächst aus Cookies geladen (in app.component)
   taskSearchValues: TaskSearchValues;
 
-  // локализованный текст (когда нет значений)
+  // lokalisierter Text (wenn keine Werte vorhanden sind)
   translateWithoutCategory: string;
   translateWithoutPriority: string;
 
-  animationState: string; // для анимации скрытия/показа любой области
-  showSearch = false; // показать/скрыть область поиска
+  animationState: string; // zum Ein-/Ausblenden der Animation eines beliebigen Bereichs
+  showSearch = false; // Suchbereich ein-/ausblenden
 
 
   // цвета
   readonly colorCompletedTask = '#F8F9FA';
   readonly colorWhite = '#fff';
 
-  // были ли изменения в фильтрах поиска
+  // Gab es Änderungen an den Suchfiltern?
   filterChanged = false;
 
-  // иконка сортировки (убывание, возрастание)
+  // Sortiersymbol (absteigend, aufsteigend)
   sortIconName: string;
-  // названия иконок из коллекции
+  // Namen von Ikonen aus der Sammlung
   readonly iconNameDown = 'arrow_downward';
   readonly iconNameUp = 'arrow_upward';
 
   readonly defaultSortColumn = 'title';
   readonly defaultSortDirection = 'asc';
 
-
   constructor(
-    private dialog: MatDialog, // работа с диалоговым окном
-    private deviceService: DeviceDetectorService, // для определения типа устройства
-    private translate: TranslateService, // локализация
+    private dialog: MatDialog, // Arbeiten mit einem Dialogfeld
+    private deviceService: DeviceDetectorService, // um den Gerätetyp zu bestimmen
+    private translate: TranslateService, // Lokalisierung
   ) {
     this.isMobile = this.deviceService.isMobile();
-
-
   }
 
-
   ngOnInit(): void {
-    // при изменении языка - обновить переводы, которые хранятся в переменных
+    // Wenn sich die Sprache ändert, aktualisieren Sie die in Variablen gespeicherten Übersetzungen
     this.translate.onLangChange.subscribe((event: TranslationChangeEvent) => {
       this.initTranslations();
     });
-
     this.initDateRangeForm();
-
   }
 
-  // ссылка на компоненты формы (для сокращения кода, чтобы каждый раз не писать this.datePickerRange.get('') )
+  // Link zu Formularkomponenten (um den Code zu kürzen, damit er nicht geschrieben wird this.datePickerRange.get('') )
   get dateFrom(): AbstractControl {
     return this.dateRangeForm.get('dateFrom');
   }
 
-  // ссылка на компоненты формы (для сокращения кода, чтобы каждый раз не писать this.datePickerRange.get('') )
+  // Link zu Formularkomponenten (um den Code zu kürzen, damit er nicht geschrieben wird this.datePickerRange.get('') )
   get dateTo(): AbstractControl {
     return this.dateRangeForm.get('dateTo');
   }
 
-
-  // обновить переводы, которые хранятся в переменных
+  // Aktualisieren Sie Übersetzungen, die in Variablen gespeichert sind
   initTranslations(): void {
     this.translate.get(['TASKS.WITHOUT-CATEGORY', 'TASKS.WITHOUT-PRIORITY']).subscribe((res: string) => {
       this.translateWithoutCategory = res['TASKS.WITHOUT-CATEGORY']; // в нужном переводе
@@ -214,165 +191,131 @@ export class TaskListComponent implements OnInit {
     });
   }
 
-  // передать данные таблице для отображения задач
+  // Übergeben Sie Daten an die Tabelle, um Aufgaben anzuzeigen
   assignTableSource(): void {
 
-    // датасорс обязательно нужно создавать для таблицы, в него присваивается любой источник (БД, массивы, JSON и пр.)
+    // Für die Tabelle muss eine Datenquelle erstellt werden; ihr wird eine beliebige Quelle (DB, Arrays, JSON usw.) zugewiesen.
     if (!this.dataSource) {
       return;
     }
-    this.dataSource.data = this.tasks; // обновить источник данных (т.к. данные массива tasks обновились)
-
+    this.dataSource.data = this.tasks; // Aktualisieren Sie die Datenquelle (da die Daten des Aufgabenarrays aktualisiert wurden).
   }
 
-
-  // в зависимости от статуса задачи - вернуть цвет
+  // Abhängig vom Status der Aufgabe - geben Sie die Farbe zurück
   getPriorityColor(task: Task): string {
 
-    // если задача завершена - возвращаем цвет
+    // Wenn die Aufgabe abgeschlossen ist, geben Sie die Farbe zurück
     if (task.completed) {
       return this.colorCompletedTask;
     }
-
-    // вернуть цвет приоритета, если он указан
+    // Gibt die Priorität farbe zurück, falls angegeben
     if (task.priority && task.priority.color) {
       return task.priority.color;
     }
-
-    return this.colorWhite; // дефолтный цвет, если никакой не был найден
-
+    return this.colorWhite; // Standardfarbe, wenn keine gefunden wurde
   }
 
-
-  // нажали/отжали выполнение задачи
+  // gedrückt/losgelassen, um eine Aufgabe abzuschließen
   onToggleCompleted(task: Task): void {
 
-    // меняем значение на противоположное
+    // Ändern Sie den Wert in das Gegenteil
     if (task.completed === 0) {
       task.completed = 1;
     } else {
       task.completed = 0;
     }
-
-    this.updateTaskEvent.emit(task); // нужно обновить объект в БД
-
+    this.updateTaskEvent.emit(task); // Sie müssen das Objekt in der Datenbank aktualisieren
   }
 
-
-  // диалоговое окно подтверждения удаления
+  // Bestätigungsdialog zum Löschen
   openDeleteDialog(task: Task): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       maxWidth: '500px',
       data: {
-
         dialogTitle: this.translate.instant('COMMON.CONFIRM'),
         message: this.translate.instant('TASKS.CONFIRM-DELETE', {name: task.title})
-
-
       },
       autoFocus: false
     });
 
     dialogRef.afterClosed().subscribe(result => {
-
-
-      if (!(result)) { // если просто закрыли окно, ничего не нажав
+      if (!(result)) { // wenn Sie gerade das Fenster geschlossen haben, ohne auf etwas zu klicken
         return;
       }
-
-
-      if (result.action === DialogAction.OK) { // если нажали ОК
+      if (result.action === DialogAction.OK) { // wenn Sie auf OK geklickt haben
         this.deleteTaskEvent.emit(task);
       }
     });
   }
 
-
-  // диалоговое редактирования задачи
+  // Dialogbearbeitungsaufgabe
   openEditDialog(task: Task): void {
 
-
     const dialogRef = this.dialog.open(EditTaskDialogComponent, {
-      // task уже будет с какими-то данными, т.к. редактируем
+      // Die Aufgabe enthält bereits einige Daten, weil bearbeiten
       data: [task, this.translate.instant('TASKS.EDITING'), this.categories, this.priorities],
-      // this.categories, this.priorities - для выбора в выпад. списке
+      // This.categories, this.priorities - aus der Dropdown-Liste auszuwählen
       autoFocus: false,
-      maxHeight: '90vh' // будет занимать 90% экрана по высоте
+      maxHeight: '90vh' // wird 90 % der Bildschirmhöhe einnehmen
     });
 
-    // подписываемся на результат работы диалогового окна
+    // Abonnieren Sie das Ergebnis des Dialogfelds
     dialogRef.afterClosed().subscribe(result => {
-
-
-      if (!(result)) { // если просто закрыли окно, ничего не нажав
+      if (!(result)) { // wenn Sie gerade das Fenster geschlossen haben, ohne auf etwas zu klicken
         return;
       }
-
-
       if (result.action === DialogAction.DELETE) {
         this.deleteTaskEvent.emit(task);
         return;
       }
-
       if (result.action === DialogAction.COMPLETE) {
-        task.completed = 1; // ставим статус задачи как выполненная
+        task.completed = 1; // Setzen Sie den Aufgabenstatus auf „erledigt“.
         this.updateTaskEvent.emit(task);
       }
-
-
       if (result.action === DialogAction.ACTIVATE) {
-        task.completed = 0; // возвращаем статус задачи как невыполненная
+        task.completed = 0; // Gibt den Aufgabenstatus als „unvollendet“ zurück
         this.updateTaskEvent.emit(task);
         return;
       }
-
-      if (result.action === DialogAction.SAVE) { // если нажали ОК и есть результат
+      if (result.action === DialogAction.SAVE) { // wenn Sie auf OK geklickt haben und es ein Ergebnis gibt
         this.updateTaskEvent.emit(task);
         return;
       }
-
-
     });
   }
 
-
-  // диалоговое окно добавления задачи
+  // Dialogfeld „Aufgabe hinzufügen“.
   openAddDialog(): void {
 
-    // создаем пустую задачу, чтобы передать ее в диалог. окно
+    // Wir erstellen eine leere Aufgabe, um sie an den Dialog zu senden. Fenster
     const task = new Task(null, '', 0, null, this.selectedCategory, this.user);
 
     const dialogRef = this.dialog.open(EditTaskDialogComponent, {
 
-      // передаем новый пустой объект  для заполнения
-      // также передаем справочные даныне (категории, приоритеты)
+      // Übergeben eines neuen leeren Objekts zum Füllen
+      // auch Referenzdaten (Kategorien, Prioritäten) übermitteln
       data: [task, this.translate.instant('TASKS.ADDING'), this.categories, this.priorities],
       maxHeight: '95vh' // будет занимать 95% экрана по высоте
 
     });
 
-    // подписываемся на результат работы диалогового окна
+    // Abonnieren Sie das Ergebnis des Dialogfelds
     dialogRef.afterClosed().subscribe(result => {
-
-      if (!(result)) { // если просто закрыли окно, ничего не нажав
+      if (!(result)) { // wenn Sie gerade das Fenster geschlossen haben, ohne auf etwas zu klicken
         return;
       }
-
-      if (result.action === DialogAction.SAVE) { // если нажали ОК
+      if (result.action === DialogAction.SAVE) { // wenn Sie auf OK geklickt haben
         this.addTaskEvent.emit(task);
       }
     });
-
   }
 
-
-  // в это событие попадает как переход на другую страницу (pageIndex), так и изменение кол-ва данных на страниц (pageSize)
+  // Dieses Ereignis umfasst sowohl einen Übergang zu einer anderen Seite als auch eine Änderung der Anzahl der Daten auf Seiten (pageSize).
   pageChanged(pageEvent: PageEvent): void {
     this.pagingEvent.emit(pageEvent);
   }
 
-
-  // анимация скрытия/показа поиска
+  // Animation der versteckten/anzeigenden Suche
   initAnimation(): void {
     if (this.showSearch) {
       this.animationState = 'show';
@@ -381,68 +324,54 @@ export class TaskListComponent implements OnInit {
     }
   }
 
-
-  // иниц-я формы для хранения периоды дат (для фильтрации)
+  // Ausgangsformulare zum Speichern von Datumsperioden (zur Filterung)
   initDateRangeForm(): void {
     this.dateRangeForm = new FormGroup({
       dateFrom: new FormControl(),
       dateTo: new FormControl()
     });
 
-    // подписываемся на события изменения дат
-    // (т.к. в текущей версии компонента mat-date-range-input нет соотв. события, которое можно обработать
+    // Abonnieren Sie Terminänderungsveranstaltungen
+    // (da die aktuelle Version der mat-date-range-input-Komponente kein entsprechendes Ereignis hat, das verarbeitet werden kann
     this.dateFrom.valueChanges.subscribe(() => this.checkFilterChanged());
     this.dateTo.valueChanges.subscribe(() => this.checkFilterChanged());
   }
 
-
-  // проверяет, были ли изменены какие-либо параметры поиска (по сравнению со старым значением)
+  // prüft, ob Suchparameter geändert wurden (im Vergleich zum alten Wert)
   checkFilterChanged(): boolean {
 
     if (!this.taskSearchValues) {
       return;
     }
-
     this.filterChanged = false;
 
-
-    // поочередно проверяем все фильтры (текущее введенное значение с последним сохраненным)
+    // Wir überprüfen alle Filter einzeln (der aktuell eingegebene Wert mit dem zuletzt gespeicherten).
     if (this.taskSearchValues.title !== this.filterTitle) {
       this.filterChanged = true;
     }
-
     if (this.taskSearchValues.completed !== this.filterCompleted) {
       this.filterChanged = true;
     }
-
     if (this.taskSearchValues.priorityId !== this.filterPriorityId) {
       this.filterChanged = true;
     }
-
     if (this.taskSearchValues.sortColumn !== this.filterSortColumn) {
       this.filterChanged = true;
     }
-
     if (this.taskSearchValues.sortDirection !== this.filterSortDirection) {
       this.filterChanged = true;
     }
-
     if (this.taskSearchValues.dateFrom !== this.dateFrom.value) {
       this.filterChanged = true;
     }
-
     if (this.taskSearchValues.dateTo !== this.dateTo.value) {
       this.filterChanged = true;
     }
-
     return this.filterChanged;
-
   }
 
-
-  // выбрать правильную иконку (убывание, возрастание) для отображения на странице
+  // Wählen Sie das richtige Symbol (absteigend, aufsteigend) aus, das auf der Seite angezeigt werden soll
   initSortDirectionIcon(): void {
-
     if (this.filterSortDirection === 'desc') {
       this.sortIconName = this.iconNameDown;
     } else {
@@ -450,89 +379,77 @@ export class TaskListComponent implements OnInit {
     }
   }
 
-
-  // изменили направление сортировки
+  // Sortierrichtung geändert
   changedSortDirection(): void {
 
-    // filterSortDirection затем записывается в taskSearchValues
+    // filterSortDirection wird dann in taskSearchValues geschrieben
     if (this.filterSortDirection === 'asc') {
       this.filterSortDirection = 'desc';
     } else {
       this.filterSortDirection = 'asc';
     }
-
-    this.initSortDirectionIcon(); // применяем правильную иконку
-
+    this.initSortDirectionIcon(); // Wenden Sie das richtige Symbol an
   }
 
-  // проинициализировать локальные переменные поиска
+  // Lokale Such variablen initialisieren
   initSearchValues(): void {
 
     if (!this.taskSearchValues) {
       return;
     }
 
-    // эти локальные переменные показываются на html странице
+    // Diese lokalen Variablen werden auf der HTML-Seite angezeigt
     this.filterTitle = this.taskSearchValues.title;
     this.filterCompleted = this.taskSearchValues.completed;
     this.filterPriorityId = this.taskSearchValues.priorityId;
     this.filterSortColumn = this.taskSearchValues.sortColumn;
     this.filterSortDirection = this.taskSearchValues.sortDirection;
 
-    // форма для хранения данных календаря (фильтрация задач по периоду)
+    // Formular zum Speichern von Kalenderdaten (Aufgaben nach Zeitraum filtern)
     if (this.taskSearchValues.dateFrom) {
       this.dateFrom.setValue(this.taskSearchValues.dateFrom);
     }
-
     if (this.taskSearchValues.dateTo) {
       this.dateTo.setValue(this.taskSearchValues.dateTo);
     }
-
   }
 
-  // сбросить локальные переменные поиска
+  // Lokale Such variablen zurücksetzen
   clearSearchValues(): void {
     this.filterTitle = '';
     this.filterCompleted = null;
     this.filterPriorityId = null;
     this.filterSortColumn = this.defaultSortColumn;
     this.filterSortDirection = this.defaultSortDirection;
-    this.clearDateRange(); // очистить период даты
+    this.clearDateRange(); // klarer Datumszeitraum
   }
 
-  // очистка дат в фильтре поиска
+  // Löschtermine im Suchfilter
   clearDateRange(): void {
     this.dateFrom.setValue(null);
     this.dateTo.setValue(null);
   }
 
-  // показать/скрыть инструменты поиска
+  // Suchwerkzeuge ein-/ausblenden
   onToggleSearch(): void {
-
     this.toggleSearchEvent.emit(!this.showSearch);
-
   }
 
-
-  // параметры поиска
+  // Suchparameter
   initSearch(): void {
 
-    // сохраняем значения перед поиском - записываем все выбранные значения пользователя
+    // Werte vor der Suche speichern – alle ausgewählten Benutzerwerte aufzeichnen
     this.taskSearchValues.title = this.filterTitle;
     this.taskSearchValues.completed = this.filterCompleted;
     this.taskSearchValues.priorityId = this.filterPriorityId;
     this.taskSearchValues.sortColumn = this.filterSortColumn;
     this.taskSearchValues.sortDirection = this.filterSortDirection;
-    this.taskSearchValues.dateTo = this.dateTo.value; // даты берем из полей формы
+    this.taskSearchValues.dateTo = this.dateTo.value; // Die Daten entnehmen wir den Formularfeldern
     this.taskSearchValues.dateFrom = this.dateFrom.value;
 
     this.searchActionEvent.emit(this.taskSearchValues);
 
-    this.filterChanged = false; // сбрасываем флаг изменения
-
-
+    this.filterChanged = false; // Änderungsflag zurücksetzen
   }
-
-
 }
 

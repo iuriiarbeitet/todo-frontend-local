@@ -2,9 +2,9 @@
 <div class="spinner" *ngIf="spinner && spinner.visibility | async"></div>
 
 
-<ng-sidebar-container *ngIf="!isLoading"> <!--контейнер для внедрения слайд-меню-->
+<ng-sidebar-container *ngIf="!isLoading"> <!--Container zur Implementierung eines Folienmenüs-->
 
-  <!--  слайд-меню-->
+  <!--  Folienmenü -->
   <ng-sidebar
 
     [opened]="menuOpened"
@@ -14,112 +14,79 @@
     [mode]="menuMode"
     [animate]="true"
     [position]="menuPosition"
-    [autoFocus]="false"
-
-
-  >
-
+    [autoFocus]="false">
 
     <!--
-                 как правильно локализовывать компонент intro.js в HTML
+                wie man eine Komponente richtig lokalisiert intro.js в HTML
                  https://github.com/usablica/intro.js/issues/693-->
 
     <div class="sidebar"
          data-color="purple"
          data-step="1"
          [attr.data-intro]=" 'HELP.FILTER-TASKS' | translate "
-         data-position='right'
-    >
+         data-position='right'>
 
-      <!--    список категорий-->
+      <!--    Liste der Kategorien  -->
       <app-categories
-
-
         [categories]="categories"
         [selectedCategory]="selectedCategory"
         [user]="user"
         [categorySearchValues]="categorySearchValues"
         [stat]="stat"
 
-
-
         (addCategoryEvent)="addCategory($event)"
         (updateCategoryEvent)="updateCategory($event)"
         (deleteCategoryEvent)="deleteCategory($event)"
         (searchCategoryEvent)="searchCategory($event)"
         (toggleMenuEvent)="toggleMenu()"
-        (selectCategoryEvent)="selectCategory($event)"
-
-
-      ></app-categories>
-
+        (selectCategoryEvent)="selectCategory($event)">
+      </app-categories>
 
     </div>
 
   </ng-sidebar>
 
-
-  <!--  основной контент-->
-  <!--  ng-sidebar-content - над чем будет открываться слайд-меню-->
+  <!--  Hauptinhalt-->
+  <!--  ng-sidebar-content - Was öffnet das Folienmenü oben-->
   <div ng-sidebar-content>
 
     <div class="main-panel wrapper" [ngClass]="{'mobile-background': isMobile}">
 
-
-      <!--    навигация с шапкой и списком категорий-->
-
+      <!--    Navigation mit Kopfzeile und Kategorien liste  -->
       <nav class="navbar navbar-transparent navbar-absolute fixed-top navbar-expand"
            [ngClass]="{'mobile-action-bar': isMobile}">
 
-        <!--     шапка с меню -->
+        <!-- Menükopf -->
         <app-header
           [categoryName]="selectedCategory ? selectedCategory.title: 'All'"
           [user]="user"
           [showStat]="showStat"
           [showMobileSearch]="showSearch"
 
-
-
           (settingsChangedEvent)="settingsChanged($event)"
           (toggleMenuEvent)="toggleMenu()"
           (toggleStatEvent)="toggleStat($event)"
-          (toggleMobileSearchEvent)="toggleSearch($event)"
-
-        >
-
+          (toggleMobileSearchEvent)="toggleSearch($event)">
         </app-header>
-
-
       </nav>
-
 
       <div class="content">
         <div class="container-fluid nopadding">
 
-
-          <!-- статистика -->
+          <!-- Statistiken -->
           <app-stat *ngIf="!isMobile"
-
                     [dash]="dash"
-                    [showStat]="showStat"
-          >
-
+                    [showStat]="showStat">
           </app-stat>
 
-
-
-
-
-          <!--        список задач-->
+          <!--   Aufgabenliste  -->
           <app-tasks
-
             (updateTaskEvent)="updateTask($event)"
             (deleteTaskEvent)="deleteTask($event)"
             (addTaskEvent)="addTask($event)"
             (pagingEvent)="paging($event)"
             (toggleSearchEvent)="toggleSearch($event)"
             (searchActionEvent)="searchTasks($event)"
-
 
             [showSearch]="showSearch"
             [tasks]="tasks"
@@ -128,29 +95,15 @@
             [selectedCategory]="selectedCategory"
             [taskSearchValues]="taskSearchValues"
             [user]="user"
-            [totalTasksFounded]="totalTasksFound"
-
-          >
-
+            [totalTasksFounded]="totalTasksFound">
           </app-tasks>
-
-
         </div>
-
       </div>
-
 
       <div *ngIf="!isMobile">
-        <!--    нижняя часть страницы (футер, подвал) -->
+        <!--    Ende der Seite (Fußzeile, Fußzeile) -->
         <app-footer></app-footer>
-
       </div>
-
-
     </div>
-
-
   </div>
-
-
 </ng-sidebar-container>

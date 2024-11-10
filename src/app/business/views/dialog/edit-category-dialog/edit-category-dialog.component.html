@@ -1,47 +1,32 @@
-<!--создание/редактирование категории-->
-
+<!--Erstellen/Bearbeiten einer Kategorie-->
 
 <mat-dialog-content>
   <p mat-dialog-title>{{dialogTitle}}</p>
 
-
   <mat-form-field>
     <mat-label>{{'COMMON.NAME-20SYMBOLS' | translate}}</mat-label>
-    <input
-      #inputTitle
-
-      matInput maxlength="15"
+    <input #inputTitle matInput maxlength="15"
 
       [(ngModel)]="category.title"
-      (keydown.enter)="confirm()"
+      (keydown.enter)="confirm()"/>
 
-    />
-
-    <button
-      *ngIf="category.title.trim().length > 0"
-
-      class="clear-icon"
+    <button *ngIf="category.title.trim().length > 0" class="clear-icon"
       matSuffix mat-icon-button aria-label="Clear"
 
-      (click)="category.title= ''"
-
-    >
+      (click)="category.title= ''">
       <mat-icon>clear</mat-icon>
     </button>
   </mat-form-field>
 </mat-dialog-content>
 
-
-<!--  кнопки возможных действий-->
+<!--  Schaltflächen für mögliche Aktionen-->
 <mat-dialog-actions class="padding-bottom-20">
 
   <div class="col-12 text-center nopadding">
 
-    <button
-      mat-raised-button color="primary"
-      (click)="confirm()"
-      [disabled]="inputTitle.value.trim().length==0"
-    >
+    <button mat-raised-button color="primary"
+            (click)="confirm()"
+      [disabled]="inputTitle.value.trim().length==0">
       {{'COMMON.SAVE' | translate}}
     </button>
 
@@ -49,22 +34,14 @@
 
   </div>
 
-
   <div class="col-12 text-center">
-
-
-    <button
-      *ngIf="canDelete"
-      mat-button
+    <button *ngIf="canDelete" mat-button
       (click)="delete()" class="red">
 
       {{'COMMON.DELETE' | translate}}
 
     </button>
-
-
   </div>
-
 
 </mat-dialog-actions>
 

@@ -14,37 +14,36 @@ import {Priority} from '../../../model/Priority';
     styleUrls: ['./settings-dialog.component.css']
 })
 
-// диалоговое окно настроек приложения
-// т.к. настройки не привязаны к другим компонентам (окнам),
-// то он самостоятельно может загружать нужные данные с помощью dataHandler (а не получать их с помощью @Input)
+/*
+Dialogfeld „Anwendungseinstellungen“.
+Weil Einstellungen sind nicht an andere Komponenten (Fenster) gebunden,
+dann kann er die benötigten Daten selbstständig per dataHandler laden (und nicht per @Input empfangen)
+ */
 
 export class SettingsDialogComponent implements OnInit {
 
-    priorities: Priority[]; // список приоритетов для редактирования/удаления
-    settingsChanged = false; // были ли изменены настройки
-    lang: string; // хранит выбранный язык в настройках
+    priorities: Priority[]; // Prioritätenliste zum Bearbeiten/Löschen
+    settingsChanged = false; // wurden die Einstellungen geändert?
+    lang: string; // speichert die ausgewählte Sprache in den Einstellungen
     user: User;
     isLoading: boolean;
 
-    // просто ссылаются на готовые константы
     en = LANG_EN;
     de = LANG_DE;
 
-
     constructor(
-        private dialogRef: MatDialogRef<SettingsDialogComponent>, // для возможности работы с текущим диалог. окном
-        @Inject(MAT_DIALOG_DATA) private data: [User], // данные, которые передаем в текущее диалоговое окно
-        private priorityService: PriorityService, // ссылка на сервис для работы с данными
-        private translate: TranslateService, // для локализации
+        private dialogRef: MatDialogRef<SettingsDialogComponent>, // um mit dem aktuellen Dialogfenster arbeiten zu können
+        @Inject(MAT_DIALOG_DATA) private data: [User], // Daten, die in das aktuelle Dialogfeld übertragen werden
+        private priorityService: PriorityService, // Link zum Dienst zum Arbeiten mit Daten
+        private translate: TranslateService, // zur Lokalisierung
     ) {
-
         this.lang = translate.currentLang;
     }
 
     ngOnInit(): void {
-        this.user = this.data[0]; // получаем текущего пользователя
+        this.user = this.data[0]; // Aktuellen Benutzer abrufen
 
-        // получаем все приоритеты, чтобы отобразить настройку цветов
+        // Holen Sie sich alle Prioritäten, um die Farbeinstellung anzuzeigen
         this.loadPriorities();
     }
 
@@ -56,10 +55,9 @@ export class SettingsDialogComponent implements OnInit {
         });
     }
 
-    // нажали Закрыть
     close(): void {
 
-        if (this.settingsChanged) { // если в настройках произошли изменения
+        if (this.settingsChanged) { // wenn es Änderungen in den Einstellungen gibt
             this.dialogRef.close(new DialogResult(DialogAction.SETTINGS_CHANGE, this.priorities));
         } else {
             this.dialogRef.close(new DialogResult(DialogAction.CANCEL));
@@ -67,60 +65,50 @@ export class SettingsDialogComponent implements OnInit {
     }
 
 
-    // добавили приоритет
+    // zusätzliche Priorität
     addPriority(priority: Priority): void {
 
         priority.user = this.user;
 
-        this.settingsChanged = true; // в настройках произошли изменения
+        this.settingsChanged = true; // Es gab Änderungen in den Einstellungen
 
-        // сначала обновить в БД
+        // erstes Update in der Datenbank
         this.priorityService.add(priority).subscribe(result => {
-            // т.к. данные простые и без сортировки - то можно просто добавить объект в локальный массив,
-            // а не запрашивать заново из БД
             this.priorities.push(result);
         });
     }
 
-    // удалили приоритет
+    // Priorität entfernt
     deletePriority(priority: Priority): void {
 
-        this.settingsChanged = true; // в настройках произошли изменения
+        this.settingsChanged = true; // Es gab Änderungen in den Einstellungen
 
-        // сначала обновить в БД
         this.priorityService.delete(priority.id).subscribe(() => {
-
-                // т.к. данные простые и без сортировки - то можно просто удалить объект в локальном массиве,
-                // а не запрашивать заново из БД
                 this.priorities.splice(this.getPriorityIndex(priority), 1);
             }
         );
     }
 
-    // обновили приоритет
-    updatePriority(priority: Priority): void { // priority - измененный объект, который нужно отправить на backend
+    // aktualisierte Priorität
+    updatePriority(priority: Priority): void { // priority - geändertes Objekt, das an das Backend gesendet werden soll
 
-        this.settingsChanged = true; // в настройках произошли изменения
+        this.settingsChanged = true;
 
-        // сначала обновить в БД
         this.priorityService.update(priority).subscribe(() => {
-
-                // т.к. данные простые и без сортировки - то можно просто обновить объект в локальном массиве,
-                // а не запрашивать заново из БД
                 this.priorities[this.getPriorityIndex(priority)] = priority;
             }
         );
     }
 
-    // находит индекс элемента (по id) в локальном массиве
+    // findet den Index eines Elements (nach ID) in einem lokalen Array
     getPriorityIndex(priority: Priority): number {
         const tmpPriority = this.priorities.find(t => t.id === priority.id);
         return this.priorities.indexOf(tmpPriority);
     }
 
-    // переключение языка
+    // Sprache wechseln
     langChanged(): void {
-        this.translate.use(this.lang); // сразу устанавливаем язык для приложения
-        this.settingsChanged = true; // указываем, что настройки были изменены
+        this.translate.use(this.lang); // Stellen Sie sofort die Sprache für die Anwendung ein
+        this.settingsChanged = true; // zeigen an, dass die Einstellungen geändert wurden
     }
 }

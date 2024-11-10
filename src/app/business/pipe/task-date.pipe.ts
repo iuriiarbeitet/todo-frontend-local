@@ -2,9 +2,9 @@ import {Pipe, PipeTransform} from '@angular/core';
 import {DatePipe} from '@angular/common';
 import {TranslateService} from '@ngx-translate/core';
 
-// преобразовывает дату в нужный текстовый формат
+// Konvertiert das Datum in das gewünschte Textformat
 
-// документация https://angular.io/guide/pipes
+// Dokumentation https://angular.io/guide/pipes
 
 @Pipe({
     name: 'taskDate'
@@ -15,13 +15,13 @@ export class TaskDatePipe implements PipeTransform {
 
     }
 
-    transform(date: Date | string, format: string = 'mediumDate'): string { // mediumDate - форматирование по-умолчанию
+    transform(date: Date | string, format: string = 'mediumDate'): string { // mediumDate - Standardformatierung
 
         if (!date) {
             return this.translate.instant('TASKS.WITHOUT-DATE');
         }
 
-        date = new Date(date); // из string делаем Date, чтобы далее уже работать с объектом Date
+        date = new Date(date); // Aus dem String erstellen wir Date, um weiter mit dem Date-Objekt arbeiten zu können
 
         const currentDate = new Date().getDate();
 
@@ -38,7 +38,7 @@ export class TaskDatePipe implements PipeTransform {
 
         }
 
-        return new DatePipe(this.translate.currentLang).transform(date, format); // показывать дату в нужной локали
+        return new DatePipe(this.translate.currentLang).transform(date, format); // Zeigt das Datum im gewünschten Gebietsschema an
     }
 
 }

@@ -12,55 +12,52 @@ import {Category} from '../../../model/Category';
     styleUrls: ['./edit-category-dialog.component.css']
 })
 
-// создание/редактирование категории
+// Erstellen/Bearbeiten einer Kategorie
 export class EditCategoryDialogComponent implements OnInit {
 
     constructor(
-        private dialogRef: MatDialogRef<EditCategoryDialogComponent>, // для работы с текущим диалог. окном
-        @Inject(MAT_DIALOG_DATA) private data: [Category, string], // данные, которые передали в диалоговое окно
-        private dialogBuilder: MatDialog, // для открытия нового диалогового окна (из текущего) - например для подтверждения удаления
-        private translate: TranslateService // локализация
+        private dialogRef: MatDialogRef<EditCategoryDialogComponent>, // um mit dem aktuellen Dialogfenster zu arbeiten
+        @Inject(MAT_DIALOG_DATA) private data: [Category, string], // Daten, die an das Dialogfeld übergeben wurden
+        private dialogBuilder: MatDialog, // um ein neues Dialogfeld zu öffnen – beispielsweise um den Löschvorgang zu bestätigen
+        private translate: TranslateService // Lokalisierung
     ) {
     }
 
-    dialogTitle: string; // текст для диалогового окна
-    category: Category; // переданный объект для редактирования
-    canDelete = false; // можно ли удалять объект (активна ли кнопка удаления)
+    dialogTitle: string; // Text für das Dialogfeld
+    category: Category; // übergebenes Objekt zur Bearbeitung
+    canDelete = false; // Ist es möglich, ein Objekt zu löschen (ist die Schaltfläche „Löschen“ aktiv)?
 
     ngOnInit(): void {
 
-        // получаем переданные данные из компонента
+        // die übergebenen Daten von der Komponente empfangen
         this.category = this.data[0];
         this.dialogTitle = this.data[1];
 
-        // если было передано значение, значит это редактирование, поэтому делаем удаление возможным (иначе скрываем иконку)
+        // Wenn ein Wert übergeben wurde, handelt es sich um eine Bearbeitung, daher ermöglichen wir das Löschen.
         if (this.category && this.category.id && this.category.id > 0) {
             this.canDelete = true;
         }
     }
 
-
-  // нажали ОК
+  // klickte auf OK
   confirm(): void {
 
-    // если не ввели название - выходим из метода и не даем сохранить
-    // (пользователь будет обязан ввести какое-либо значение или просто закрыть окно)
+    // Wenn Sie keinen Namen eingegeben haben, beenden wir die Methode und lassen Sie sie nicht speichern
+    // (Der Benutzer muss einen Wert eingeben oder einfach das Fenster schließen)
     if (!this.category.title || this.category.title.trim().length === 0){
       return;
     }
 
-    // нажали ОК и передаем измененный объект category
+    // Klicken Sie auf OK und übertragen Sie die geänderte Kategorie objekt
     this.dialogRef.close(new DialogResult(DialogAction.SAVE, this.category));
   }
 
-  // нажали отмену
+  // Abbrechen gedrückt
   cancel(): void {
     this.dialogRef.close(new DialogResult(DialogAction.CANCEL));
   }
 
-
-
-  // нажали Удалить
+  // klickte auf Löschen
   delete(): void {
 
     const dialogRef = this.dialogBuilder.open(ConfirmDialogComponent, {
@@ -74,18 +71,12 @@ export class EditCategoryDialogComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
 
-      if (!(result)) { // если просто закрыли окно, ничего не нажав
+      if (!(result)) { // wenn Sie gerade das Fenster geschlossen haben, ohne auf etwas zu klicken
         return;
       }
-
-
       if (result.action === DialogAction.OK) {
-        this.dialogRef.close(new DialogResult(DialogAction.DELETE)); // подтвердил удаление
+        this.dialogRef.close(new DialogResult(DialogAction.DELETE)); // bestätigte Löschung
       }
     });
-
-
   }
-
-
 }

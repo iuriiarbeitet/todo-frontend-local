@@ -7,7 +7,6 @@ export class Category {
     uncompletedCount: number;
     user: User;
 
-    // ? означает необязательный для передачи параметр
     constructor(id: number, title: string, user: User, completedCount?: number,  uncompletedCount?: number) {
         this.id = id;
         this.title = title;

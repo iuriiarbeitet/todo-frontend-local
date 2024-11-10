@@ -1,77 +1,57 @@
 <div class="container-fluid settings">
 
-    <!--  кнопка открытия-закрытия меню-->
+    <!--  Taste zum Öffnen/Schließen des Menüs -->
     <div class="col-9 text-left align-self-top nopadding action-bar">
-
         <button mat-icon-button type="button" (click)="onToggleMenu()" class="nomargin">
-
             <mat-icon>menu</mat-icon>
-
         </button>
-
         <p class="link navbar-brand nopadding-bottom" (click)="onToggleStat()" *ngIf="!isMobile">{{'STAT.SHOW-HIDE' | translate}}
         </p>
-
       <p class="navbar-brand nomargin nopadding" *ngIf="isMobile"> "{{categoryName}}"</p>
-
     </div>
 
-
-    <!--    // примеры выпадающих меню https://material.angular.io/components/menu/examples
--->
-
-    <!--  помощь, настройки-->
+    <!--  Hilfe, Einstellungen -->
     <div class="col-3 text-right align-self-top nopadding action-bar">
-
-
         <div class="action-bar-item">
 
-<!--            кнопка, которое открывает меню-->
+<!--            Schaltfläche, die ein Menü öffnet  -->
             <button mat-icon-button [matMenuTriggerFor]="menu">
                 <mat-icon>more_vert</mat-icon>
             </button>
-
             <mat-menu #menu="matMenu">
-
-<!--                имя пользователя-->
+<!--                Benutzername  -->
                 <p class="text-center padding-25 account">
                     {{user.username}}
                 </p>
 
-
-<!--                настройки приложения-->
+<!--                Anwendungseinstellungen  -->
                 <button mat-menu-item (click)="showSettings()">
                     <mat-icon>settings</mat-icon>
                     <span>{{'COMMON.SETTINGS' | translate}}</span>
                 </button>
 
-<!--                справка-->
+<!--                Referenz  -->
                 <button mat-menu-item (click)="showIntroHelp()" *ngIf="!isMobile" class="header-icon">
                     <mat-icon>help</mat-icon>
                     <span>{{'COMMON.HELP' | translate}}</span>
                 </button>
 
-<!--                выход из системы-->
+<!--                Abmelden  -->
                 <button mat-menu-item (click)="logout()">
                     <mat-icon>login</mat-icon>
                     <span>{{'COMMON.EXIT' | translate}}</span>
                 </button>
-
-
             </mat-menu>
-
         </div>
-
 
       <div class="action-bar-item" *ngIf="isMobile">
 
-        <!--    для мобильных - иконка поиска - открывает/скрывает поисковую область-->
+        <!--    für Mobilgeräte – Suchsymbol – öffnet/versteckt den Suchbereich  -->
         <button mat-icon-button (click)="onToggleMobileSearch()" class="header-icon nopadding max-width-60">
           <mat-icon>search</mat-icon>
         </button>
 
       </div>
-
     </div>
 </div>
 

@@ -14,23 +14,20 @@ import {Priority} from '../../../model/Priority';
   styleUrls: ['./header.component.css']
 })
 
-// "presentational component": отображает полученные данные и отправляет какие-либо действия обработчику
-// назначение - работа с меню и другими данными вверху страницы
-// класс не видит dataHandler, т.к. напрямую с ним не должен работать
-
-
-// примеры выпадающих меню https://material.angular.io/components/menu/examples
-
-
+/*
+    "presentational component": zeigt die empfangenen Daten an und sendet alle Aktionen an den Handler
+    Zweck – Arbeiten mit Menüs und anderen Daten oben auf der Seite.
+    Die Klasse sieht den dataHandler nicht, weil sollte nicht direkt damit funktionieren
+ */
 export class HeaderComponent implements OnInit {
 
-  // ----------------------- входящие параметры ----------------------------
+  // ----------------------- eingehende Parameter ----------------------------
 
   @Input()
-  categoryName: string; // текущая выбранная категория для отображения
+  categoryName: string; // aktuell ausgewählte Kategorie zur Anzeige
 
   @Input()
-  user: User; // пользователь для отображения его имени
+  user: User; // Benutzer, seinen Namen anzuzeigen
 
   @Input()
   showStat: boolean;
@@ -39,31 +36,27 @@ export class HeaderComponent implements OnInit {
   showMobileSearch: boolean;
 
 
-  // ----------------------- исходящие действия----------------------------
+  // ----------------------- ausgehende Aktionen ----------------------------
 
   @Output()
-  toggleMenuEvent = new EventEmitter(); // показать/скрыть меню
+  toggleMenuEvent = new EventEmitter(); // Menü ein-/ausblenden
 
   @Output()
-  toggleStatEvent = new EventEmitter<boolean>(); // показать/скрыть статистику
+  toggleStatEvent = new EventEmitter<boolean>(); // Statistiken ein-/ausblenden
 
   @Output()
   settingsChangedEvent = new EventEmitter<Priority[]>();
 
   @Output()
-  toggleMobileSearchEvent = new EventEmitter<boolean>(); // показать/скрыть поиск (для моб. устройств)
+  toggleMobileSearchEvent = new EventEmitter<boolean>(); // Suche ein-/ausblenden (für mobile Geräte)
 
-  // -------------------------------------------------------------------------
-
-
-  isMobile: boolean; // зашли на сайт с мобильного устройства или нет?
-
+  isMobile: boolean; // Haben Sie über ein mobiles Gerät auf die Website zugegriffen oder nicht?
 
   constructor(
-    private dialogBuilder: MatDialog, // для отображения диалоговых окон
-    private deviceService: DeviceDetectorService, // для определения устройства пользователя
+    private dialogBuilder: MatDialog, // um Dialogfelder anzuzeigen
+    private deviceService: DeviceDetectorService, // um das Gerät des Benutzers zu ermitteln
     private auth: AuthService,
-    private introService: IntroService, // сервис для справки - выделяются области с подсказками
+    private introService: IntroService, // Hilfe-Service – Bereiche mit Hinweisen werden hervorgehoben
 
   ) {
     this.isMobile = deviceService.isMobile();
@@ -72,24 +65,21 @@ export class HeaderComponent implements OnInit {
   ngOnInit(): void {
   }
 
-
-  // скрыть/показать левое меню с категорими
+  // Linkes Menü mit Kategorien ein-/ausblenden
   onToggleMenu(): void {
-    this.toggleMenuEvent.emit(); // показать/скрыть меню
+    this.toggleMenuEvent.emit(); // Menü ein-/ausblenden
   }
 
-  // скрыть/показать статистику
+  // Statistiken ein-/ausblenden
   onToggleStat(): void {
-    this.toggleStatEvent.emit(!this.showStat); // вкл/выкл статистику
+    this.toggleStatEvent.emit(!this.showStat);
   }
-
 
   logout(): void {
-    this.auth.logout(); // нужно вызвать сервис (бекенд) для выхода из системы
+    this.auth.logout(); // Sie müssen den Dienst (Backend) aufrufen, um sich abzumelden
   }
 
-
-  // окно настроек
+  // Einstellungsfenster
   showSettings(): void {
     const dialogRef = this.dialogBuilder.open(SettingsDialogComponent,
       {
@@ -97,7 +87,7 @@ export class HeaderComponent implements OnInit {
         width: '600px',
         minHeight: '300px',
         data: [this.user],
-        maxHeight: '90vh' // будет занимать 90% экрана по высоте
+        maxHeight: '90vh' // wird 90 % der Bildschirmhöhe einnehmen
 
       },
     );
@@ -111,16 +101,13 @@ export class HeaderComponent implements OnInit {
     });
   }
 
-
-  // показать/скрыть инструменты поиска
+  // Suchwerkzeuge ein-/ausblenden
   onToggleMobileSearch(): void {
     this.toggleMobileSearchEvent.emit(!this.showMobileSearch);
   }
 
-
-  // начать работу intro
+  // Erste Schritte, Einführung (intro)
   showIntroHelp(): void {
     this.introService.startIntroJS();
   }
-
 }

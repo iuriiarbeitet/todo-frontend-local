@@ -1,66 +1,51 @@
-<!--диалоговое окно настроек приложения-->
+<!--Dialogfeld „Anwendungseinstellungen“.-->
 
 <mat-dialog-content>
 
     <mat-tab-group animationDuration="0ms">
 
-        <!--        вкладка настройки приоритетов-->
-
+        <!--        Registerkarte „Prioritätseinstellungen“.-->
         <mat-tab label="{{'SETTINGS.PRIORITY' | translate}}">
-
             <img src="/assets/img/loading.gif" class="loading" *ngIf="isLoading">
 
-
-            <!--  список приоритетов с цветами-->
+            <!--  Prioritätenliste mit Blumen -->
             <app-priorities
                     [priorities]="priorities"
                     [user]="user"
 
                     (addPriorityEvent)="addPriority($event)"
                     (deletePriorityEvent)="deletePriority($event)"
-                    (updatePriorityEvent)="updatePriority($event)"
-            >
-
+                    (updatePriorityEvent)="updatePriority($event)">
             </app-priorities>
-
-
         </mat-tab>
 
-        <!--        вкладка для переключения языков-->
+        <!-- Registerkarte zum Umschalten der Sprache -->
         <mat-tab label="{{'SETTINGS.LANG' | translate}}" [ngClass]="{'tab-lang': true}">
 
             <label>{{'LANG.SELECT' | translate}}</label>
 
-            <mat-radio-group
-
-                    class="radio-group"
+            <mat-radio-group class="radio-group"
 
                     [(ngModel)]="lang"
-                    (ngModelChange)="langChanged()"
-            >
+                    (ngModelChange)="langChanged()">
                 <mat-radio-button value="{{en}}">
                     {{'LANG.EN' | translate}}
                 </mat-radio-button>
-
 
                 <mat-radio-button value="{{de}}">
                     {{'LANG.DE' | translate}}
                 </mat-radio-button>
 
-
             </mat-radio-group>
-
         </mat-tab>
     </mat-tab-group>
 
-
 </mat-dialog-content>
 
-<!--  кнопки возможных действий-->
+<!--  Schaltflächen für mögliche Aktionen  -->
 <mat-dialog-actions>
 
     <button mat-raised-button color="primary" (click)="close()">{{'COMMON.CLOSE' | translate}}</button>
-
 
 </mat-dialog-actions>
 

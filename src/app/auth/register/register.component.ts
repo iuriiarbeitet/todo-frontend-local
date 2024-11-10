@@ -5,10 +5,8 @@ import {AuthService, User} from '../service/auth.service';
 import {DeviceDetectorService} from 'ngx-device-detector';
 
 
-/*
-
-Страница для регистрации нового пользователя.
-
+/**
+ * Neue Benutzerregistrierungsseite.
  */
 
 @Component({
@@ -18,40 +16,40 @@ import {DeviceDetectorService} from 'ngx-device-detector';
 })
 export class RegisterComponent implements OnInit {
 
-  form: FormGroup; // форма с введенными данными
-  isLoading = false; // идет ли загрузка в данный момент (для показа/скрытия индикатора загрузки)
-  error: string; // текст ошибки от сервера (если есть)
-  firstSubmitted = false; // становится true при первом нажатии (чтобы сразу не показывать ошибки полей, а только после первой попытки)
-  isMobile: boolean; // зашли на сайт с мобильного устройства или нет?
+  form: FormGroup; // Formular mit eingegebenen Daten
+  isLoading = false; // ob der Laden gerade läuft (um den Laden-Indikator anzuzeigen/auszublenden)
+  error: string; // Fehlertext vom Server (falls vorhanden)
+  // wird beim ersten Klick wahr (um Feldfehler nicht sofort anzuzeigen, sondern erst nach dem ersten Versuch)
+  firstSubmitted = false;
+  isMobile: boolean;// Haben Sie über ein mobiles Gerät auf die Website zugegriffen oder nicht?
 
 
-  // внедрение всех нужных объектов
+  // Umsetzung aller notwendigen Objekte
   constructor(
       private formBuilder: FormBuilder,
-      private route: ActivatedRoute, // текущий роут, куда уже перешли (можно считывать данные, например параметры)
-      private router: Router, // для навигации, перенаправления на другие страницы
-      private authService: AuthService, // сервис аутентификации
-      private deviceService: DeviceDetectorService, // для определения типа устройства
+      private route: ActivatedRoute, // aktuelle Route, wohin Sie bereits gegangen sind (Sie können Daten, zum Beispiel Parameter, ablesen)
+      private router: Router, // zur Navigation, Weiterleitung zu anderen Seiten
+      private authService: AuthService, // Authentifizierungsdienst
+      private deviceService: DeviceDetectorService, // um den Gerätetyp zu bestimmen
 
   ) {
   }
 
-
-  ngOnInit(): void { // вызывается при инициализации компонента (до отображения внешнего вида)
+  ngOnInit(): void { // Wird aufgerufen, wenn die Komponente initialisiert wird (bevor das Erscheinungsbild gerendert wird)
 
     this.isMobile = this.deviceService.isMobile();
 
-    // инициализация формы с нужными полями, начальными значениями и валидаторами
+    // Initialisieren des Formulars mit den erforderlichen Feldern, Anfangswerten und Validatoren
     this.form = this.formBuilder.group({
-      username: ['', [Validators.required]], // Validators.required - проверка на обязательность заполнения
-      email: ['', [Validators.required, Validators.email]], // Validators.email - проверка правильности введенного email
-      password: ['', [Validators.required, Validators.minLength(6)]], // пароль - не меньше 6 символов
-      confirmPassword: ['', [Validators.required, Validators.minLength(6)]] // повторно должен ввести пароль, чтобы не ошибиться
+      username: ['', [Validators.required]], // Validators.required - Überprüfen Sie, ob die Füllung obligatorisch ist
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', [Validators.required, Validators.minLength(6)]]
     });
 
   }
 
-  // ссылка на компоненты формы (для сокращения кода, чтобы каждый раз не писать this.form.get('') )
+  // Verweis auf Formularkomponenten (um den Code zu kürzen, damit nicht jedes Mal this.form.get('') geschrieben werden muss)
   get usernameField(): AbstractControl {
     return this.form.get('username');
   }
@@ -68,65 +66,55 @@ export class RegisterComponent implements OnInit {
     return this.form.get('confirmPassword');
   }
 
-
-  // попытка отправки данных формы регистрации
+  // Versuchen Sie, Daten aus dem Registrierungsformular zu übermitteln
   public submitForm(): void {
 
-    this.firstSubmitted = true; // один раз нажали на отправку формы (можно теперь показывать ошибки)
+    this.firstSubmitted = true; // einmal angeklickt, um das Formular abzusenden (Sie können jetzt Fehler anzeigen)
 
-    if (this.form.invalid) { // если есть хотя бы одна ошибка в введенных данных формы
-      return; // не отправляем данные на сервер
+    if (this.form.invalid) { // wenn mindestens ein Fehler in den eingegebenen Formulardaten vorliegt
+      return; // Senden Sie keine Daten an den Server
     }
+    this.isLoading = true; // Ladeanzeige anzeigen
 
-    this.isLoading = true; // показываем индикатор загрузки
-
-    // объект для отправки на сервер (добавляется в тело запроса)
+    // Objekt, das an den Server gesendet werden soll (zum Anfragetext hinzugefügt)
     const user = new User();
     user.username = this.usernameField.value;
     user.email = this.emailField.value;
     user.password = this.passwordField.value;
 
-    // отправка запроса на сервер
+    // Senden einer Anfrage an den Server
     this.authService.register(user).subscribe(
-        () => { // запрос успешно выполнился без ошибок
+        () => { // Die Anfrage wurde erfolgreich und ohne Fehler ausgeführt
 
-          this.isLoading = false; // скрыть индикатор загрузки
+          this.isLoading = false; // Ladeanzeige ausblenden
 
-          this.error = null; // если до этого показывалась ошибка на странице - скрываем ее
+          this.error = null; // Wenn auf der Seite zuvor ein Fehler angezeigt wurde, blenden Sie ihn aus
 
-          // показываем пользователю информацию на новой странице
+          // Zeigt die Benutzerinformationen auf einer neuen Seite an
           this.router.navigate(['/info-page',{msg: 'An email has been sent to confirm your account. Check your email in 1-2 minutes.'}]);
 
         },
-        err => { // запрос выполнился с ошибкой (можем использовать переменную err)
-          this.isLoading = false; // скрыть индикатор загрузки
+        err => {
+          this.isLoading = false;
 
-
-          switch (err.error.exception) { // считываем тип ошибки, чтобы правильно среагировать
-
-            case 'DataIntegrityViolationException': { // при добавлении данных - произошла ошибка целостности (неверный внешний ключ)
-              this.error = `User or email already exists`; // будет показана ошибка на странице
+          switch (err.error.exception) {
+            case 'DataIntegrityViolationException': { // Beim Hinzufügen von Daten ist ein Integritätsfehler aufgetreten (ungültiger Fremdschlüssel).
+              this.error = `User or email already exists`;
               break;
             }
-
-
-            case 'ConstraintViolationException': {  // при добавлении данных - произошла ошибка уникальности строки
-              this.error = `User or email already exists`; // будет показана ошибка на странице
+            case 'ConstraintViolationException': {  // Beim Hinzufügen von Daten ist ein Fehler bei der Eindeutigkeit der Zeile aufgetreten
+              this.error = `User or email already exists`;
               break;
             }
-
             case 'UserOrEmailAlreadyExistException': {
-              this.error = `User or email already exists`; // будет показана ошибка на странице
+              this.error = `User or email already exists`;
               break;
             }
-
-            default: { // если любой другой тип ошибки - просто показать информацию
-              this.error = `Error`; // будет показана ошибка на странице
+            default: {
+              this.error = `Error`;
               break;
             }
-
           }
-
         });
   }
 }

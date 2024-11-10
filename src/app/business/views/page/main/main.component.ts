@@ -29,310 +29,277 @@ export const LANG_EN = 'en';
 })
 export class MainComponent implements OnInit {
 
-  // тип устройства
-  isMobile: boolean; // смартфон
-  isTablet: boolean; // планшет
+  // Gerätetyp
+  isMobile: boolean;
+  isTablet: boolean;
 
-  user: User = null; // текущий пользователь (аккаунт) - получаем только его данные - по email
+  user: User = null; // aktueller Benutzer (Konto) – wir erhalten nur seine Daten – per E-Mail
 
-  // параметры бокового меню с категориями
-  menuOpened = true; // открыть-закрыть
-  menuMode: string; // тип выдвижения (поверх, с толканием и пр.)
-  menuPosition: string; // позиция меню
-  showBackdrop: boolean; // показывать ли затемнение
-
-
-  tasks: Task[]; // текущие задачи для отображения на странице
-  priorities: Priority[]; // приоритеты для отображения
-  categories: Category[]; // категории для отображения и фильтрации
-
-  isLoading: boolean; // идет ли сейчас загрузка или нет (для отображения иконки загрузки)
-
-  showStat = true;   // показать/скрыть статистику
-
-  // контейнеры с параметрами для поиска данных
-  categorySearchValues = new CategorySearchValues(); // для поиска категорий (в том числе для отображения всех категорий)
-  taskSearchValues: TaskSearchValues; // экземпляр создаем позже, когда подгрузим данные из cookies
-
-  // если равно null - по-умолчанию будет выбираться категория 'Все'
-  selectedCategory: Category = null; // выбранная категория (фильтрует задачи только выбранной категории)
+  // Seitenmenüoptionen mit Kategorien
+  menuOpened = true; // öffnen-schließen
+  menuMode: string; // Art der Verlängerung (oben, schieben usw.)
+  menuPosition: string; // Menüpunkt
+  showBackdrop: boolean; // ob Dimmen angezeigt werden soll
 
 
-  dash: DashboardData = new DashboardData(); // данные для отображения дашбоарда статистики
-  stat: Stat; // данные общей статистики - entity класс для получения объекта из backend
+  tasks: Task[]; // Aktuelle Aufgaben, die auf der Seite angezeigt werden sollen
+  priorities: Priority[]; // Prioritäten anzuzeigen
+  categories: Category[]; // Kategorien zum Anzeigen und Filtern
 
-  // сколько всего найдено задач после поиска (для постраничного отображения важно знать сколько вообще записей найдено)
+  isLoading: boolean; // ob es gerade geladen wird oder nicht (um das Ladesymbol anzuzeigen)
+
+  showStat = true;   // Statistiken ein-/ausblenden
+
+  // Container mit Parametern für die Datensuche
+  categorySearchValues = new CategorySearchValues(); // um nach Kategorien zu suchen (einschließlich der Anzeige aller Kategorien)
+  taskSearchValues: TaskSearchValues; // Wir erstellen später eine Instanz, wenn wir Daten aus Cookies laden
+
+  // wenn gleich null, wird standardmäßig die Kategorie „Alle“ ausgewählt
+  selectedCategory: Category = null; // ausgewählte Kategorie (filtert nur Aufgaben der ausgewählten Kategorie)
+
+
+  dash: DashboardData = new DashboardData(); // Daten zur Anzeige des Statistik-Dashboards
+  stat: Stat; // Allgemeine Statistikdaten – Entitätenklasse zum Abrufen eines Objekts vom Backend
+
+  // wie viele Aufgaben nach der Suche gefunden wurden
+  // (für die seitenweise Darstellung ist es wichtig zu wissen, wie viele Datensätze gefunden wurden)
   totalTasksFound: number;
 
-  // дефолтные значения для постраничности
-  readonly defaultPageSize = 5; // сколько данных отображать на странице
-  readonly defaultPageNumber = 0; // активная открытая страница (первая, индекс с нуля)
+  // Standardwerte für die Paginierung
+  readonly defaultPageSize = 5; // wie viele Daten auf der Seite angezeigt werden sollen
+  readonly defaultPageNumber = 0; // Aktive geöffnete Seite (zuerst, Index von Grund auf)
 
-  showSearch = false; // область поиска
+  showSearch = false; // Suchbereich
 
-  // утилита для работы с cookies - сразу создаем объект, т.к. он нужен для загрузки начальных значений
+  // ein Dienstprogramm zum Arbeiten mit Cookies - wir erstellen sofort ein Objekt, weil es wird benötigt, um Anfangswerte zu laden
   cookiesUtils = new CookieUtils();
 
-  // названия cookies
-  readonly cookieTaskSeachValues = 'todo:searchValues'; // для сохранения параметров поиска в формате JSON
-  readonly cookieShowStat = 'todo:showStat'; // показывать или нет статистику
-  readonly cookieShowMenu = 'todo:showMenu'; // показывать или нет статистику
-  readonly cookieShowSearch = 'todo:showSearch'; // показывать или нет инструменты поиска
-  readonly cookieLang = 'todo:lang'; // язык интерфейса
+  // Cookie-Namen
+  readonly cookieTaskSeachValues = 'todo:searchValues'; // um Suchparameter im JSON-Format zu speichern
+  readonly cookieShowStat = 'todo:showStat'; // Statistiken anzeigen oder nicht
+  readonly cookieShowMenu = 'todo:showMenu'; // Statistiken anzeigen oder nicht
+  readonly cookieShowSearch = 'todo:showSearch'; // Suchwerkzeuge anzeigen oder nicht
+  readonly cookieLang = 'todo:lang'; // Schnittstellensprache
 
-  spinner: SpinnerService; // индикатор загрузки в центре экрана (при каждом HTTP запросе)
-
+  spinner: SpinnerService; // Ladeanzeige in der Mitte des Bildschirms (bei jeder HTTP-Anfrage)
 
   constructor(
-    // сервисы для работы с данными (фасад)
+    // Dienste für die Arbeit mit Daten (Fassade)
     private taskService: TaskService,
     private categoryService: CategoryService,
     private priorityService: PriorityService,
     private statService: StatService,
     private authService: AuthService,
-    private deviceService: DeviceDetectorService, // для определения типа устройства (моб., десктоп, планшет)
-    private translate: TranslateService, // для локализации
-    private spinnerService: SpinnerService // индикатор загрузки в центре экрана (при каждом HTTP запросе)
+    private deviceService: DeviceDetectorService, // zur Bestimmung des Gerätetyps (Mobil, Desktop, Tablet)
+    private translate: TranslateService, // zur Lokalisierung
+    private spinnerService: SpinnerService // Ladeanzeige in der Mitte des Bildschirms (bei jeder HTTP-Anfrage)
 
   ) {
 
-
   }
-
 
   ngOnInit(): void {
 
-    // напрямую к spinnerService нельзя обратиться из html, т.к. private, поэтому создаем свою переменную
+    // Auf spinnerService kann nicht direkt über HTML zugegriffen werden, weil privat, also erstellen wir unsere eigene Variable
     this.spinner = this.spinnerService;
 
-    // определяем тип устройства
+    // Bestimmen Sie den Gerätetyp
     this.isMobile = this.deviceService.isMobile();
     this.isTablet = this.deviceService.isTablet();
 
-    this.initSidebar(); // начальная загрузка ng-sidebar
+    this.initSidebar(); // Erstmaliges Laden der ng-Sidebar
 
-    this.initLangCookie(); // установить язык интерфейса
+    this.initLangCookie(); // Stellen Sie die Sprache der Benutzeroberfläche ein
 
-
-    // не рекомендуется вкладывать subscribe друг в друга,
-    // но чтобы не усложнять код цепочками rxjs - сделал попроще (можете переделать)
-
-
-    // для фильтрации данных конкретного пользователя
+    // um Daten für einen bestimmten Benutzer zu filtern
     this.authService.currentUser.subscribe(user => {
 
-
         this.user = user;
-        this.categorySearchValues.email = this.user.email; // сразу указываем email для будущего поиска
+        this.categorySearchValues.email = this.user.email; // Geben Sie sofort Ihre E-Mail-Adresse für zukünftige Suchanfragen an
 
-
-        // первоначальная загрузка статистики и остальные нужные действия
+        // Erstmaliges Laden von Statistiken und andere notwendige Aktionen
         this.statService.getOverallStat(this.user.email).subscribe((result => {
           this.stat = result;
 
-          // заполнить категории
+          // Füllen Sie die Kategorien aus
           this.categoryService.findAll(this.user.email).subscribe(res => {
             this.categories = res;
 
-            // заполнить приоритеты
+            // Tragen Sie Prioritäten ein
             this.priorityService.findAll(this.user.email).subscribe(prior => {
               this.priorities = prior;
             });
 
+            if (!this.initSearchCookie()) { // Laden Sie alle Cookies herunter, um den Anwendungsstatus wiederherzustellen
 
-            if (!this.initSearchCookie()) { // загружаем все куки, чтобы восстановить состояние приложения
-
-              // если куки не загрузились или их нет (вернулось false),
-              // то устанавливаем значения по-умолчанию для этих 2-х обяз. параметров,
-              // чтобы запрос в БД обработал корректно (иначе будет ошибка)
-              // остальные параметры могут быть null
+              /*
+              wenn die Cookies nicht geladen wurden oder keine vorhanden sind (false wurde zurückgegeben),
+              dann legen wir die Standardwerte für diese 2 erforderlichen fest. Parameter,
+              damit die Anfrage an die Datenbank korrekt verarbeitet wird (sonst kommt es zu einem Fehler)
+              andere Parameter können null sein
+               */
               this.taskSearchValues = new TaskSearchValues();
-              this.taskSearchValues.pageSize = this.defaultPageSize; // обязательный параметр, не должен быть пустым
-              this.taskSearchValues.pageNumber = this.defaultPageNumber; // обязательный параметр, не должен быть пустым
+              this.taskSearchValues.pageSize = this.defaultPageSize; // erforderlicher Parameter, darf nicht leer sein
+              this.taskSearchValues.pageNumber = this.defaultPageNumber; // erforderlicher Parameter, darf nicht leer sein
             }
 
-            if (this.isMobile) { // для мобильной версии никогда не показываем статистику
+            if (this.isMobile) { // Für die mobile Version zeigen wir keine Statistiken an
               this.showStat = false;
             } else {
-              this.initShowStatCookie(); // кук - показывать или нет общую статистику сверху
+              this.initShowStatCookie(); // Cook – allgemeine Statistiken oben anzeigen oder nicht
             }
 
-            this.initShowSearchCookie(); // кук - показывать или нет инструменты поиска
+            this.initShowSearchCookie(); // Cookie – Suchwerkzeuge anzeigen oder nicht
 
-            // первоначальное отображение задач при загрузке приложения
-            // запускаем только после выполнения статистики (т.к. понадобятся ее данные) и загруженных категорий
+            // erste Anzeige der Aufgaben beim Laden der Anwendung
+            // erst ausführen, nachdem die Statistiken abgeschlossen wurden (da ihre Daten benötigt werden) und Kategorien geladen wurden
             this.selectCategory(this.selectedCategory); // selectedCategory может быть загружен из кука (если был сохранен)
-
-
           });
         }));
-
-
       }
     );
-
-
-
-
   }
 
-
-  // начальное отображение левого меню (sidebar)
+  // Erstanzeige des linken Menüs (Sidebar)
   initSidebar(): void {
 
-    this.menuPosition = 'left'; // меню слева
+    this.menuPosition = 'left'; // Menü auf der linken Seite
 
-    // настройки бокового меню для моб. и десктоп вариантов
+    // Seitenmenüeinstellungen für Mobilgeräte. und Desktop-Optionen
     if (this.isMobile) {
-      this.menuOpened = false; // на моб. версии по-умолчанию меню будет закрыто
-      this.menuMode = 'over'; // поверх всего контента
-      this.showBackdrop = true; // если нажали на область вне меню - закрыть его
-    } else { // если это десктоп
+      this.menuOpened = false; // zum Handy Standardmäßig wird das Menü geschlossen
+      this.menuMode = 'over'; // zusätzlich zu allen Inhalten
+      this.showBackdrop = true; // Wenn Sie auf einen Bereich außerhalb des Menüs klicken, schließen Sie es
+    } else { // wenn es ein Desktop ist
 
-      this.initShowMenuCookie(); // НЕ в моб. версии загружаем значение из кука
-      this.menuMode = 'push'; // будет "толкать" основной контент, а не закрывать его
+      this.initShowMenuCookie(); // NICHT im Handy. Versionen laden den Wert aus dem Cookie
+      this.menuMode = 'push'; // wird den Hauptinhalt „verdrängen“, anstatt ihn abzudecken
       this.showBackdrop = false;
     }
 
   }
 
-  // показать-скрыть меню
+  // Menü ein-/ausblenden
   toggleMenu(): void {
-    this.menuOpened = !this.menuOpened; // изменяем значение на обратное
+    this.menuOpened = !this.menuOpened; // Ändern Sie den Wert in das Gegenteil
 
-    // сохраняем в cookies текущее значение
+    // Speichern Sie den aktuellen Wert in Cookies
     this.cookiesUtils.setCookie(this.cookieShowMenu, String(this.menuOpened));
   }
 
-
-  // добавление категории
+  // Hinzufügen einer Kategorie
   addCategory(category: Category): void {
     this.categoryService.add(category).subscribe(result => {
-        this.searchCategory(this.categorySearchValues); // обновить список категорий
+        this.searchCategory(this.categorySearchValues); // Kategorie liste aktualisieren
       }
     );
   }
 
-
-  // обновлении категории
+  // Kategorie aktualisierung
   updateCategory(category: Category): void {
     this.categoryService.update(category).subscribe(() => {
-      this.searchCategory(this.categorySearchValues); // обновляем список категорий
+      this.searchCategory(this.categorySearchValues); // Aktualisierung der Kategorien liste
     });
   }
 
-
-  // поиск категории
+  // Kategorie suche
   searchCategory(categorySearchValues: CategorySearchValues): void {
     this.categoryService.findCategories(categorySearchValues).subscribe(result => {
-      this.categories = result; // автоматически обновится список на HTML странице
+      this.categories = result; // Die Liste wird auf der HTML-Seite automatisch aktualisiert
     });
-
   }
 
-
-  // удаление категории
+  // Löschen einer Kategorie
   deleteCategory(category: Category): void {
 
-    // если удаляем выбранную ранее категорию (текущую активную)
+    // wenn Sie eine zuvor ausgewählte Kategorie (derzeit aktiv) löschen
     if (this.selectedCategory && category.id === this.selectedCategory.id) {
-      this.selectedCategory = null; // выбираем категорию "Все"
+      this.selectedCategory = null; // Wählen Sie die Kategorie „Alle“
     }
 
     this.categoryService.delete(category.id).subscribe(cat => {
-      this.searchCategory(this.categorySearchValues); // обновляем список категорий
+      this.searchCategory(this.categorySearchValues); // Aktualisierung der Kategorien liste
       this.selectCategory(this.selectedCategory);
     });
   }
 
-
-  // выбрали/изменили категорию (нужно показать соотв. задачи и выполнить другие нужные действия)
+  // eine Kategorie ausgewählt/geändert (Sie müssen die entsprechenden Aufgaben anzeigen und andere notwendige Aktionen ausführen)
   selectCategory(category: Category): void {
-    this.selectedCategory = category; // запоминаем выбранную категорию, чтобы передать потом в смарт компонент main
+    this.selectedCategory = category; // Merken Sie sich die ausgewählte Kategorie, um sie später an die Haupt-Smart-Komponente zu übergeben
 
-    // заполняем данные дэша
-    if (category) { // если выбрана конкретная категория - берем данные из нее
+    // Geben Sie die Dashboard-Daten ein
+    if (category) { // Wenn eine bestimmte Kategorie ausgewählt wird, übernehmen wir Daten daraus
       this.dash.completedTotal = category.completedCount;
       this.dash.uncompletedTotal = category.uncompletedCount;
-    } else { // если выбрана категория Все (category == null) - показываем общую статистику
+    } else { // wenn die Kategorie „Alle“ ausgewählt ist (Kategorie == null) – allgemeine Statistiken anzeigen
       this.dash.completedTotal = this.stat.completedTotal;
       this.dash.uncompletedTotal = this.stat.uncompletedTotal;
     }
 
-    // сбрасываем, чтобы показывать результат с первой страницы
+    // Zurücksetzen, um das Ergebnis der ersten Seite anzuzeigen
     this.taskSearchValues.pageNumber = 0;
 
-    this.selectedCategory = category; // запоминаем выбранную категорию
+    this.selectedCategory = category; // Merken Sie sich die ausgewählte Kategorie
 
-    // для поиска задач по данной категории
-    this.taskSearchValues.categoryId = category ? category.id : null; // (если category == null, то будут показаны все задачи)
+    // um nach Aufgaben in dieser Kategorie zu suchen
+    this.taskSearchValues.categoryId = category ? category.id : null; // (Wenn Kategorie == null, dann werden alle Aufgaben angezeigt)
 
-    // обновить список задач согласно выбранной категории и другим параметрам поиска из taskSearchValues
+    // Aktualisieren Sie die Liste der Aufgaben entsprechend der ausgewählten Kategorie und anderen Suchparametern von taskSearchValues
     this.searchTasks(this.taskSearchValues);
-
   }
 
-
-  // показать-скрыть статистику
+  // Statistiken ein- und ausblenden
   toggleStat(showStat: boolean): void {
     this.showStat = showStat;
 
-    // сохраняем в cookies текущее значение
+    // Speichern Sie den aktuellen Wert in Cookies
     this.cookiesUtils.setCookie(this.cookieShowStat, String(showStat));
-
   }
 
-
-  // поиск задач (если параметры равны null - найдутся все задачи пользователя)
+  // nach Aufgaben suchen (wenn die Parameter null sind, werden alle Benutzeraufgaben gefunden)
   searchTasks(searchTaskValues: TaskSearchValues): void {
 
-    // сохраняем в cookies текущее значение
+    // Speichern Sie den aktuellen Wert in Cookies
     this.cookiesUtils.setCookie(this.cookieTaskSeachValues, JSON.stringify(this.taskSearchValues));
 
     this.taskSearchValues = searchTaskValues;
-    this.taskSearchValues.email = this.user.email; // залогиненный пользователь (чтобы получить только его задачи)
+    this.taskSearchValues.email = this.user.email; // Angemeldeter Benutzer (um nur seine Aufgaben zu erhalten)
 
-    this.taskService.findTasks(this.taskSearchValues).subscribe(result => { // в result запишется объект pageable из backend
+    this.taskService.findTasks(this.taskSearchValues).subscribe(result => { // Das Ergebnis enthält das auslagerbare Objekt aus dem Backend
 
-      this.totalTasksFound = result.totalElements; // сколько данных показывать на странице
-      this.tasks = result.content; // массив задач
-
+      this.totalTasksFound = result.totalElements; // wie viele Daten auf der Seite angezeigt werden sollen
+      this.tasks = result.content; // Reihe von Aufgaben
 
     });
-
-
   }
 
-
-  // обновить общую статистику для категории Все (и показать эти данные в дашборде, если выбрана категория "Все")
+  // Statistiken für die Kategorie „Alle“ aktualisieren (und diese Daten im Dashboard anzeigen, wenn die Kategorie „Alle“ ausgewählt ist)
   updateOverallStat(): void {
 
-    this.statService.getOverallStat(this.user.email).subscribe((res => { // получить из БД актуальные данные
-      this.stat = res; // получили данные из БД
+    this.statService.getOverallStat(this.user.email).subscribe((res => { // Holen Sie sich aktuelle Daten aus der Datenbank
+      this.stat = res; // Daten aus der Datenbank erhalten
 
-      if (!this.selectedCategory) { // если выбрана категория "Все" (selectedCategory === null)
+      if (!this.selectedCategory) { // wenn die Kategorie „Alle“ ausgewählt ist (selectedCategory === null)
         this.dash.uncompletedTotal = this.stat.uncompletedTotal;
         this.dash.completedTotal = this.stat.completedTotal;
       }
-
     }));
-
   }
 
-
-  // обновить статистику конкретной категории (и показать эти данные в дашборде, если выбрана эта категория)
+  // Statistiken für eine bestimmte Kategorie aktualisieren (und diese Daten im Dashboard anzeigen, wenn diese Kategorie ausgewählt ist)
   updateCategoryStat(category: Category): void {
 
-    // т.к. в БД статистика обновляется триггерами - то нужно получить из БД актуальные данные для обновленное категории
+    // Weil in der Datenbank werden Statistiken durch Trigger aktualisiert.
+    // Anschließend müssen Sie aktuelle Daten für die aktualisierte Kategorie aus der Datenbank abrufen
     this.categoryService.findById(category.id).subscribe(cat => {
 
-      // заменяем категорию в локальном массиве на ту же новую, но с обновленной статистикой (которую только что получили из бекенда)
+      // Wir ersetzen die Kategorie im lokalen Array durch dieselbe neue,
+      // jedoch mit aktualisierten Statistiken (die wir gerade vom Backend erhalten haben).
+      const tmpCategory = this.categories.find(t => t.id === category.id); // Sie müssen den Index des Objekts abrufen, um es zu ersetzen
+      this.categories[this.categories.indexOf(tmpCategory)] = cat; // Ersetzen Sie ein Objekt in einem lokalen Array
 
-      const tmpCategory = this.categories.find(t => t.id === category.id); // нужно получить индекс объекта, чтобы именно его заменить
-      this.categories[this.categories.indexOf(tmpCategory)] = cat; // заменяем объект в лок. массиве
-
-      // показать дашборд со статистикой категории
-      if (this.selectedCategory && this.selectedCategory.id === cat.id) { // если на странице выбрана та категория, которую сейчас обновляем
+      // Dashboard mit Kategorie statistiken anzeigen
+      if (this.selectedCategory && this.selectedCategory.id === cat.id) {
         this.dash.uncompletedTotal = cat.uncompletedCount;
         this.dash.completedTotal = cat.completedCount;
       }
@@ -340,255 +307,212 @@ export class MainComponent implements OnInit {
     });
   }
 
-  // обновление задачи
+  // Aktualisierung der Aufgabe
   updateTask(task: Task): void {
 
-    // более правильно - реализовать код ниже с помощью цепочки rxjs (чтобы выполнялось последовательно и с условиями),
-    // но решил сильно не усложнять
-
+    // Es wäre besser, den Code unten mithilfe der rxjs-Kette umzusetzen
+    // (damit er sequenziell und mit Bedingungen ausgeführt wird),
+    // aber ich habe mich entschieden, es nicht zu sehr zu verkomplizieren.
     this.taskService.update(task).subscribe(result => {
-
-      if (task.oldCategory) { // если в измененной задаче старая категория была указана
-        this.updateCategoryStat(task.oldCategory); // обновляем счетчик для старой категории
+      if (task.oldCategory) { // wenn in der geänderten Aufgabe eine alte Kategorie angegeben war
+        this.updateCategoryStat(task.oldCategory); // aktualisieren wir den Zähler für die alte Kategorie
       }
-
-      if (task.category) { // если в измененной задаче новая категория была указана
-        this.updateCategoryStat(task.category); // обновляем счетчик для новой категории
+      if (task.category) { // wenn in der geänderten Aufgabe eine neue Kategorie angegeben war
+        this.updateCategoryStat(task.category); // aktualisieren wir den Zähler für die neue Kategorie
       }
-
-      this.updateOverallStat(); // обновляем всю статистику (в том числе счетчик для категории "Все")
-
-      this.searchTasks(this.taskSearchValues); // обновляем список задач
-
+      this.updateOverallStat(); // aktualisieren wir die gesamte Statistik (einschließlich des Zählers für die Kategorie "Alle")
+      this.searchTasks(this.taskSearchValues); // aktualisieren wir die Aufgabenliste
     });
-
   }
 
 
-  // удаление задачи
+  // Aufgabe löschen
   deleteTask(task: Task): void {
 
-    // более правильно - реализовать код ниже с помощью цепочки rxjs (чтобы выполнялось последовательно и с условиями),
-    // но решил сильно не усложнять
-
+    // Es wäre besser, den folgenden Code mithilfe einer rxjs-Kette zu implementieren
+    // (damit er sequenziell und mit Bedingungen ausgeführt wird),
+    // aber ich habe beschlossen, es nicht zu verkomplizieren
     this.taskService.delete(task.id).subscribe(result => {
-
-      if (task.category) { // если в удаленной задаче была указана категория
-        this.updateCategoryStat(task.category); // обновляем счетчик для указанной категории
+      if (task.category) { // wenn in der gelöschten Aufgabe eine Kategorie angegeben war
+        this.updateCategoryStat(task.category); // Zähler für die angegebene Kategorie aktualisieren
       }
-
-      this.updateOverallStat(); // обновляем всю статистику (в том числе счетчик для категории "Все")
-
-      this.searchTasks(this.taskSearchValues); // обновляем список задач
-
+      this.updateOverallStat(); // gesamte Statistik aktualisieren (einschließlich des Zählers für die Kategorie "Alle")
+      this.searchTasks(this.taskSearchValues); // Aufgabenliste aktualisieren
     });
-
   }
 
 
-  // добавление задачи
+  // Aufgabe hinzufügen
   addTask(task: Task): void {
-    task.user = this.user; // для какого пользователя добавляем
+    task.user = this.user; // für welchen Benutzer wird die Aufgabe hinzugefügt
 
-    // более правильно - реализовать код ниже с помощью цепочки rxjs (чтобы выполнялось последовательно и с условиями),
-    // но решил сильно не усложнять
-
+    /*
+    Es wäre besser, den folgenden Code mithilfe einer rxjs-Kette zu implementieren
+    (damit er sequenziell und mit Bedingungen ausgeführt wird),
+    aber ich habe beschlossen, es nicht zu verkomplizieren
+    */
     this.taskService.add(task).subscribe(result => {
-
-      if (task.category) { // если в новой задаче была указана категория
-        this.updateCategoryStat(task.category); // обновляем счетчик для указанной категории
+      if (task.category) { // wenn in der neuen Aufgabe eine Kategorie angegeben wurde
+        this.updateCategoryStat(task.category); // Zähler für die angegebene Kategorie aktualisieren
       }
-
-      this.updateOverallStat(); // обновляем всю статистику (в том числе счетчик для категории "Все")
-
-      this.searchTasks(this.taskSearchValues); // обновляем список задач
-
+      this.updateOverallStat(); // gesamte Statistik aktualisieren (einschließlich des Zählers für die Kategorie "Alle")
+      this.searchTasks(this.taskSearchValues); // Aufgabenliste aktualisieren
     });
-
-
   }
 
 
-  // изменили кол-во элементов на странице или перешли на другую страницу
-  // с помощью paginator
+  // Anzahl der Elemente pro Seite geändert oder zu einer anderen Seite gewechselt mithilfe des Paginators
   paging(pageEvent: PageEvent): void {
 
-    // если изменили настройку "кол-во элементов на странице" - заново делаем запрос и показываем с 1й страницы
+    // wenn die Einstellung "Anzahl der Elemente pro Seite" geändert wurde – neue Anfrage senden und ab Seite 1 anzeigen
     if (this.taskSearchValues.pageSize !== pageEvent.pageSize) {
-      this.taskSearchValues.pageNumber = 0; // новые данные будем показывать с 1-й страницы (индекс 0)
+      this.taskSearchValues.pageNumber = 0; // neue Daten ab Seite 1 anzeigen (Index 0)
     } else {
-      // если просто перешли на другую страницу
-      this.taskSearchValues.pageNumber = pageEvent.pageIndex; // считываем измененный pageNumber
+      // wenn einfach zu einer anderen Seite gewechselt wurde
+      this.taskSearchValues.pageNumber = pageEvent.pageIndex; // neuen pageNumber-Wert lesen
     }
-
     this.taskSearchValues.pageSize = pageEvent.pageSize;
-
-    this.searchTasks(this.taskSearchValues); // показываем новые данные
+    this.searchTasks(this.taskSearchValues); // neue Daten anzeigen
   }
 
-
-  // показать-скрыть поиск
+  // Suche ein-/ausblenden
   toggleSearch(showSearch: boolean): void {
 
-    this.showSearch = showSearch; // сохраняем в локальную переменную, чтобы потом сохранить ее в кук
+    this.showSearch = showSearch; // Speichern Sie es in einer lokalen Variablen, damit Sie es später in einem Cookie speichern können
 
-    // сохраняем в cookies текущее значение
+    // Speichern Sie den aktuellen Wert in Cookies
     this.cookiesUtils.setCookie(this.cookieShowSearch, String(showSearch));
-
   }
 
-  // найти из cookies все параметры поиска, чтобы восстановить все окно
+  // Finden Sie alle Suchparameter von Cookies, um das gesamte Fenster wiederherzustellen
   initSearchCookie(): boolean {
-
     const cookie = this.cookiesUtils.getCookie(this.cookieTaskSeachValues);
-
-
-    if (!cookie) { // кук не был найден
+    if (!cookie) { // Cookie wurde nicht gefunden
       return false;
     }
-
     const cookieJSON = JSON.parse(cookie);
-
-    if (!cookieJSON) { // кук был сохранен не в формате JSON
+    if (!cookieJSON) { // Das Cookie wurde nicht im JSON-Format gespeichert
       return false;
     }
-
-    // важно тут создавать новый экземпляр, чтобы Change Detector в tasks.component увидел, что ссылка изменилась,
-    // и обновил свои данные.
-    // сделано для упрощения
-
-
+    /*
+    Es ist wichtig, hier eine neue Instanz zu erstellen, damit der Änderungsdetektor in der task.component erkennt,
+    dass sich der Link geändert hat und meine Daten aktualisiert der Einfachheit halber gemacht
+    */
     if (!this.taskSearchValues) {
       this.taskSearchValues = new TaskSearchValues();
     }
 
-    // размер страницы
+    // Seitengröße
     const tmpPageSize = cookieJSON.pageSize;
     if (tmpPageSize) {
-      this.taskSearchValues.pageSize = Number(tmpPageSize); // конвертируем строку в число
+      this.taskSearchValues.pageSize = Number(tmpPageSize); // Konvertieren Sie eine Zeichenfolge in eine Zahl
     }
 
-
-    // выбранная категория
+    // ausgewählte Kategorie
     const tmpCategoryId = cookieJSON.categoryId;
     if (tmpCategoryId) {
       this.taskSearchValues.categoryId = Number(tmpCategoryId);
-      this.selectedCategory = this.getCategoryFromArray(tmpCategoryId); // записываем в переменную какая была выбрана категория
+      this.selectedCategory = this.getCategoryFromArray(tmpCategoryId); // Schreiben Sie in die Variable, welche Kategorie ausgewählt wurde
     }
 
-
-    // выбранный приоритет
+    // ausgewählte Priorität
     const tmpPriorityId = cookieJSON.priorityId as number;
     if (tmpPriorityId) {
       this.taskSearchValues.priorityId = Number(tmpPriorityId);
     }
 
-    // текст поиска
+    // Suchtext
     const tmpTitle = cookieJSON.title;
     if (tmpTitle) {
       this.taskSearchValues.title = tmpTitle;
     }
 
-
-    // статус задачи - может принимать значения: null - все, 0 - незавершенные, 1 - завершенные
+    // Aufgabenstatus – kann folgende Werte annehmen: null – alle, 0 – unvollendet, 1 – abgeschlossen
     const tmpCompleted = cookieJSON.completed as number;
     if (tmpCompleted >= 0) {
       this.taskSearchValues.completed = tmpCompleted;
     }
 
-    // столбец сортировки
+    // Spalte sortieren
     const tmpSortColumn = cookieJSON.sortColumn;
     if (tmpSortColumn) {
       this.taskSearchValues.sortColumn = tmpSortColumn;
     }
 
-    // направление сортировки
+    // Sortierrichtung
     const tmpSortDirection = cookieJSON.sortDirection;
     if (tmpSortDirection) {
       this.taskSearchValues.sortDirection = tmpSortDirection;
     }
 
-    // Дата С
+    // Datum aus
     const tmpDateFrom = cookieJSON.dateFrom;
     if (tmpDateFrom) {
       this.taskSearchValues.dateFrom = new Date(tmpDateFrom);
     }
 
-
-    // Дата ПО
-    const tmpDateTo = cookieJSON.dateTo; // название поля в классе с префиксом
+    // Datum bis
+    const tmpDateTo = cookieJSON.dateTo; // Name des Feldes in der Klasse mit einem Präfix
     if (tmpDateTo) {
       this.taskSearchValues.dateTo = new Date(tmpDateTo);
     }
-
-
-    // номер страницы можно не сохранять/восстанавливать
-    // также можно не сохранять параметры поиска категорий, чтобы при восстановлении приложения показывались все категории
-
-    return true; // кук был найден и загружен
+    return true; // Das Cookie wurde gefunden und heruntergeladen
   }
 
-
-  // находит индекс элемента (по id) в локальном массиве
+  // findet den Index eines Elements (nach ID) in einem lokalen Array
   getCategoryFromArray(id: number): Category {
     const tmpCategory = this.categories.find(t => t.id === id);
     return tmpCategory;
   }
 
-  // загружаем кук - чтобы указать язык интерфейса
+  // Laden Sie ein Cookie, um die Sprache der Benutzeroberfläche festzulegen
   initLangCookie(): void {
 
     const val = this.cookiesUtils.getCookie(this.cookieLang);
-    if (val) { // если кук найден
-      this.translate.use(val); // переключение языка
+    if (val) { // wenn das Cookie gefunden wird
+      this.translate.use(val); // Sprache wechseln
     } else {
       this.translate.use(LANG_EN);
     }
 
   }
 
-  // загружаем кук - показать меню или нет
+  // Cookies laden – Menü anzeigen oder nicht
   initShowMenuCookie(): void {
     const val = this.cookiesUtils.getCookie(this.cookieShowMenu);
-    if (val) { // если кук найден
-      this.menuOpened = (val === 'true'); // конвертация из string в boolean
+    if (val) { // wenn das Cookie gefunden wird
+      this.menuOpened = (val === 'true'); // Konvertierung von einem String in einen booleschen Wert
     }
-
   }
 
-
-  // загружаем кук - показать поиск или нет
+  // Cookies laden – Suche anzeigen oder nicht
   initShowSearchCookie(): void {
     const val = this.cookiesUtils.getCookie(this.cookieShowSearch);
-    if (val) { // если кук найден
-      this.showSearch = (val === 'true'); // конвертация из string в boolean
+    if (val) { // wenn das Cookie gefunden wird
+      this.showSearch = (val === 'true'); // Konvertierung von einem String in einen booleschen Wert
     }
 
   }
 
-  // загружаем кук - показать статистику или нет
+  // Cookies laden – Statistiken anzeigen oder nicht
   initShowStatCookie(): void {
-    if (!this.isMobile) { // если моб. устройство, то не показывать статистику
+    if (!this.isMobile) { // wenn mobil Gerät, dann werden keine Statistiken angezeigt
       const val = this.cookiesUtils.getCookie(this.cookieShowStat);
-      if (val) { // если кук найден
-        this.showStat = (val === 'true'); // конвертация из string в boolean
+      if (val) { // wenn das Cookie gefunden wird
+        this.showStat = (val === 'true'); // Konvertierung von einem String in einen booleschen Wert
       }
     }
   }
 
+  // Wurden die Anwendungseinstellungen geändert?
+  settingsChanged(priorities: Priority[]): void { // priorities - geänderte Prioritätenliste
 
-  // были ли изменены настройки приложения
-  settingsChanged(priorities: Priority[]): void { // priorities - измененный список приоритетов
+    this.priorities = priorities; // wir erhalten ein modifiziertes Array mit Prioritäten
+    this.searchTasks(this.taskSearchValues); // Aktualisieren Sie aktuelle Aufgaben und Kategorien zur Anzeige
 
-    this.priorities = priorities; // получаем измененный массив с приоритетами
-    this.searchTasks(this.taskSearchValues); // обновить текущие задачи и категории для отображения
-
-    // сохраняем в cookies текущий выбранный язык
+    // Speichern Sie die aktuell ausgewählte Sprache in Cookies
     this.cookiesUtils.setCookie(this.cookieLang, this.translate.currentLang);
-
   }
-
-
 }
 
 

@@ -7,18 +7,18 @@ import * as introJs from 'intro.js';
     providedIn: 'root'
 })
 
-// класс для работы с intro (выделение областей страницы и их описание)
+// Klasse für die Arbeit mit Intro (Auswahl von Seitenbereichen und deren Beschreibung)
 export class IntroService {
 
-    introJS = introJs(); // объект по работе с intro
+    introJS = introJs(); // Objekt zum Arbeiten mit intro
 
     constructor(
-        private translate: TranslateService // локализация
+        private translate: TranslateService // Lokalisierung
     ) {
 
     }
 
-    // показать интро (справку) с подсветкой элементов
+    // Intro (Hilfe) mit hervorgehobenen Elementen anzeigen
     public startIntroJS(): void {
 
         this.introJS.setOptions(
@@ -30,10 +30,6 @@ export class IntroService {
                 exitOnEsc: true,
                 exitOnOverlayClick: false
             });
-
         this.introJS.start();
-
-
     }
-
 }

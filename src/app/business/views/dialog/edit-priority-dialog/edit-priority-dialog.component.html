@@ -1,36 +1,21 @@
-<!--создание/редактирование категории-->
+<!--Erstellen/Bearbeiten einer Kategorie-->
 
 <mat-dialog-content>
     <p mat-dialog-title>{{dialogTitle}}</p>
 
-
     <mat-form-field>
         <mat-label>{{'PRIORITY.NAME-20SYMBOLS' | translate}}</mat-label>
-        <input
-                #inputTitle
-
-                matInput maxlength="20"
+        <input #inputTitle matInput maxlength="20"
 
                 [(ngModel)]="priority.title"
-                (keydown.enter)="confirm()"
+                (keydown.enter)="confirm()"/>
 
-        />
+        <button *ngIf="priority && priority.title.trim().length > 0" class="clear-icon" mat-button matSuffix mat-icon-button
 
-
-        <button
-                *ngIf="priority && priority.title.trim().length > 0"
-
-                class="clear-icon"
-                mat-button matSuffix mat-icon-button
-
-                (click)="priority.title = ''"
-
-        >
-
+                (click)="priority.title = ''">
 
             <mat-icon>clear</mat-icon>
         </button>
-
 
     </mat-form-field>
 
@@ -38,17 +23,14 @@
 
 </mat-dialog-content>
 
-
-<!--  кнопки возможных действий-->
+<!--  Schaltflächen für mögliche Aktionen-->
 <mat-dialog-actions class="padding-bottom-20">
 
     <div class="col-12 text-center nopadding">
 
-        <button
-                mat-raised-button color="primary"
+        <button mat-raised-button color="primary"
                 (click)="confirm()"
-                [disabled]="inputTitle.value.trim().length==0"
-        >
+                [disabled]="inputTitle.value.trim().length==0">
             {{'COMMON.SAVE' | translate}}
 
         </button>
@@ -57,19 +39,13 @@
 
     </div>
 
-
     <div class="col-12 text-center">
 
-        <button class="red"
-                mat-button
-                *ngIf="canDelete" (click)="delete()"
-        >
+        <button class="red" mat-button *ngIf="canDelete" (click)="delete()">
             {{'COMMON.DELETE' | translate}}
         </button>
 
-
     </div>
-
 
 </mat-dialog-actions>
 

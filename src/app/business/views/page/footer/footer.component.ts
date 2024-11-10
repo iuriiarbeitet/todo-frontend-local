@@ -9,8 +9,6 @@ import {MatDialog} from '@angular/material/dialog';
     styleUrls: ['./footer.component.css']
 })
 
-// "presentational component": отображает полученные данные
-// подвал - нижняя часть страницы
 export class FooterComponent implements OnInit {
     year: Date;
     site = 'iurii.rotari.1987@gmail.com';
@@ -24,11 +22,10 @@ export class FooterComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.year = new Date(); // текуший год
-
+        this.year = new Date(); // aktuelles Jahr
     }
 
-    // окно "О программе"
+    // Fenster „About“.
     openAboutDialog(): void {
         this.dialog.open(AboutDialogComponent,
             {
@@ -39,7 +36,5 @@ export class FooterComponent implements OnInit {
                 },
                 width: '400px'
             });
-
     }
-
 }

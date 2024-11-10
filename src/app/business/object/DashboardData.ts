@@ -1,7 +1,7 @@
-// данные для отображения дашбоарда со статистикой вверху страницы
+// Daten zur Anzeige eines Dashboards mit Statistiken oben auf der Seite
 export class DashboardData {
 
-    // этих двух переменных хватает для всей общей статистики
+    // Diese beiden Variablen reichen für alle allgemeinen Statistiken aus
     completedTotal: number;
     uncompletedTotal: number;
 

@@ -1,45 +1,34 @@
-<!--редактирование/создания задачи-->
+<!--Bearbeiten/Erstellen einer Aufgabe-->
 
 <mat-dialog-content>
     <p mat-dialog-title>{{dialogTitle}}</p>
 
-
-    <!--название задачи    -->
+    <!-- Aufgabenname   -->
     <mat-form-field>
 
         <mat-label>{{'TASKS.NAME-REQUIRED' | translate}}</mat-label>
-        <!-- если задача завершена - контрол не будет доступен -->
-        <input [disabled]="task.completed != null && task.completed !== 0"
-               #inputTitle
-               matInput
+        <!-- Wenn die Aufgabe abgeschlossen ist, ist das Steuerelement nicht verfügbar -->
+        <input [disabled]="task.completed != null && task.completed !== 0" #inputTitle matInput
 
                [(ngModel)]="newTitle"
 
-               (keyup.enter)="confirm()"> <!-- по нажатию на enter можем сразу сохранить задачу -->
+               (keyup.enter)="confirm()"> <!-- Durch Drücken der Eingabetaste können wir die Aufgabe sofort speichern -->
 
-        <button
-                *ngIf="newTitle && newTitle.trim().length > 0"
-
+        <button *ngIf="newTitle && newTitle.trim().length > 0"
                 [disabled]="task.completed != null && task.completed !== 0"
-
                 mat-button matSuffix mat-icon-button
-
                 (click)="newTitle= ''" class="dialog-toto-title">
-
             <mat-icon>clear</mat-icon>
         </button>
 
     </mat-form-field>
 
+  <!-- Dropdown-Liste der Kategorien -->
+  <!--
+  Wir arbeiten mit Objekt-IDs, damit die Ausfallschrittkomponenten korrekt funktionieren. Liste -->
 
-    <!--    выпадающий список категорий-->
-    <!--
-      работаем с id объектов, чтобы корректно работали компоненты выпад. списка
-    -->
-
-    <mat-form-field>
-        <mat-label>{{'TASKS.SELECT-CATEGORY' | translate}}</mat-label>
-        <!-- если задача завершена - контрол не будет доступен -->
+     <mat-form-field>
+         <mat-label>{{'TASKS.SELECT-CATEGORY' | translate}}</mat-label>
         <mat-select [(value)]="newCategoryId" [disabled]="task.completed != null && task.completed !== 0">
 
             <mat-option [value]="null">{{'TASKS.WITHOUT-CATEGORY' | translate}}</mat-option>
@@ -50,14 +39,9 @@
 
     </mat-form-field>
 
-
-    <!--    выпадающий список приоритетов-->
-    <!--
-    работаем с id объектов, чтобы корректно работали компоненты выпад. списка
-  -->
+    <!--    Dropdown-Liste „Priorität“ -->
     <mat-form-field>
         <mat-label>{{'TASKS.SELECT-PRIORITY' | translate}}</mat-label>
-        <!-- если задача завершена - контрол не будет доступен -->
         <mat-select [(value)]="newPriorityId" [disabled]="task.completed != null && task.completed !== 0">
             <mat-option [value]="null">{{'TASKS.WITHOUT-PRIORITY' | translate}}</mat-option>
 
@@ -69,122 +53,81 @@
 
     </mat-form-field>
 
-
-    <!--    календарь - срок выполнения-->
+    <!--    Kalender - Fälligkeitsdatum  -->
     <mat-form-field>
-        <!-- если задача завершена - контрол не будет доступен -->
 
       <input [disabled]="task.completed != null && task.completed !== 0"
                matInput placeholder="{{'TASKS.SELECT-DATE' | translate}}"
                #inputDate
                readonly="true"
-
              [(ngModel)]="newDate"
-
                [matDatepicker]="picker"
-
-
                (click)="picker.open()">
-
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <!-- иконка календаря (для открытия календаря) -->
+        <!-- Kalendersymbol (zum Öffnen des Kalenders) -->
+        <mat-datepicker #picker></mat-datepicker> <!-- Kalenderkomponente (öffnet sich durch Klicken) -->
 
-        <mat-datepicker #picker></mat-datepicker> <!-- компонент календаря (открывается по нажатию)-->
-
-        <!--кнопка очистки даты -->
+        <!--Schaltfläche zum Löschen des Datums -->
         <button [disabled]="task.completed != null && task.completed !== 0"
                 *ngIf="inputDate.value.trim().length > 0"
-
                 mat-button matSuffix mat-icon-button
-
                 (click)="newDate = null" class="calendar-clear-icon">
-
             <mat-icon>clear</mat-icon>
-
         </button>
-
     </mat-form-field>
 
   <div class="row">
     <div class="col-12">
-      <!-- если задача завершена - контролы не будут доступны -->
 
       <span class="ready-date" [ngClass]="{'disabled': task.completed}"
             (click)="!task.completed && setToday()">
       {{'TASKS.TODAY' | translate}}
 
     </span>
-
       <span class="ready-date" [ngClass]="{'disabled': task.completed}"
             (click)="!task.completed && addDays(1)">
       {{'TASKS.TOMORROW' | translate}}
-
     </span>
-
       <span class="ready-date" [ngClass]="{'disabled': task.completed}"
             (click)="!task.completed && addDays(2)">
       {{'TASKS.AFTER-TOMORROW' | translate}}
-
     </span>
-
       <span class="ready-date" [ngClass]="{'disabled': task.completed}"
             (click)="!task.completed && addDays(7)">
       {{'TASKS.AFTER-WEEK' | translate}}
-
     </span>
-
-
     </div>
 
-
   </div>
-
     <div class="gap20"></div>
-
 
 </mat-dialog-content>
 
-
-<!--  кнопки возможных действий-->
+<!--  Schaltflächen für mögliche Aktionen -->
 <mat-dialog-actions class="padding-bottom-20">
-
-
     <div class="col-md-5 col-12 nopadding nomargin" [ngClass]="{'text-center': isMobile, 'text-left': !isMobile}">
-
         <button class="nomargin"
                 mat-raised-button color="primary"
                 (click)="confirm()"
                 [disabled]="inputTitle.value.trim().length==0 || (task.completed != null && task.completed !== 0)">
-            <!-- если пустой текст - кнопка "Сохранить" будет недоступна -->
+            <!-- Wenn der Text leer ist, ist die Schaltfläche „Speichern“ nicht verfügbar -->
             {{'COMMON.SAVE' | translate}}
         </button>
-
-
         <button mat-raised-button (click)="cancel()"> {{'COMMON.CANCEL' | translate}}</button>
-
     </div>
 
-
-    <!--  возможные операции над задачей-->
-    <div
-            class="col-md-7 col-12 text-right nopadding nomargin"
+    <!--  mögliche Operationen an der Aufgabe-->
+    <div class="col-md-7 col-12 text-right nopadding nomargin"
             *ngIf="canComplete || canDelete"
-            [ngClass]="{'text-center': isMobile, 'text-right': !isMobile}"
-
-    >
-
+            [ngClass]="{'text-center': isMobile, 'text-right': !isMobile}">
         <button
                 mat-button class="green nomargin nopadding"
                 *ngIf="canComplete && task && !task.completed"
-                (click)="complete()"
-
-        >
-
+                (click)="complete()">
             {{'TASKS.COMPLETE-TASK' | translate}}
         </button>
 
-        <button
-                mat-button class="green nomargin nopadding"
+        <button mat-button class="green nomargin nopadding"
                 (click)="activate()"
                 *ngIf="canComplete && task && task.completed">
 
@@ -192,16 +135,10 @@
 
         </button>
 
-        <button
-                mat-button
-                *ngIf="canDelete"
-                class="red"
-                (click)="delete()"
-        >
+        <button mat-button *ngIf="canDelete" class="red"
+                (click)="delete()">
             {{'TASKS.DELETE-TASK' | translate}}
-
         </button>
-
     </div>
 
 </mat-dialog-actions>

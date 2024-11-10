@@ -1,5 +1,4 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import {RouterModule, Routes} from '@angular/router';
 import {LoginComponent} from './auth/login/login.component';
 import {RegisterComponent} from './auth/register/register.component';
@@ -13,25 +12,27 @@ import {RolesGuard} from './business/guard/roles-guard.service';
 
 
 
-// список всех роутов и связанных компонентов (маппинг)
+// Liste aller Routen und zugehörigen Komponenten (Mapping)
 const routes: Routes = [
 
-  // страницы для неавторизованных пользователей
-  {path: '', component: LoginComponent}, // главная
-  {path: 'logout', redirectTo: '', pathMatch: 'full'}, // главная
-  {path: 'index', redirectTo: '', pathMatch: 'full'}, // главная
+  // Seiten für nicht autorisierte Benutzer
+  {path: '', component: LoginComponent},
+  {path: 'logout', redirectTo: '', pathMatch: 'full'},
+  {path: 'index', redirectTo: '', pathMatch: 'full'},
 
-  {path: 'register', component: RegisterComponent}, // регистрация нового пользователя
-  {path: 'reset-password', component: SendEmailResetPasswordComponent}, // отправка письма - восстановление пароля
-  {path: 'info-page', component: InfoPageComponent}, // вам отправлено письмо
+  {path: 'register', component: RegisterComponent}, // neue Benutzerregistrierung
+  {path: 'reset-password', component: SendEmailResetPasswordComponent}, // Einen Brief senden - Passwortwiederherstellung
+  {path: 'info-page', component: InfoPageComponent}, // ein Brief wurde an Sie gesendet
 
-  // Страницы для авторизованных пользователей - для открытия страницы (и получения RESTful данных) требуется проверка ролей
-  // Тут нужно описать все варианты папок/страниц с доступом по ролям
-  // Все остальные ссылки будут перенаправлять на страницу 404
+/*
+    Seiten für autorisierte Benutzer – zum Öffnen der Seite (und zum Empfangen von RESTful-Daten) ist eine Rollenüberprüfung erforderlich.
+     Hier müssen Sie alle Optionen für Ordner/Seiten mit Zugriff durch Rollen beschreiben.
+     Alle anderen Links werden auf eine 404-Seite weitergeleitet
+ */
   {
-
-    /* спец. объект RolesGuard будет вызываться каждый раз перед выполнение данного роутинга
-      в RolesGuard считываются роли пользователя и сравниваются с allowedRoles
+    /*
+      Vor der Durchführung dieses Routings wird jedes Mal ein spezielles RolesGuard-Objekt aufgerufen.
+      RolesGuard liest Benutzerrollen und vergleicht sie mit erlaubten Rollen
      */
     path: 'main', component: MainComponent, canActivate: [RolesGuard], // при переходе по ссылке - сначала отработает RolesGuard
     data: {
@@ -39,20 +40,18 @@ const routes: Routes = [
     }
   },
 
-  {path: 'activate-account/:uuid', component: ActivateAccountComponent}, // запрос на письмо активации аккаунта
-  {path: 'update-password/:token', component: UpdatePasswordComponent}, // запрос на обновление пароля
+  {path: 'activate-account/:uuid', component: ActivateAccountComponent}, // Anfrage für ein Kontoaktivierungsschreiben
+  {path: 'update-password/:token', component: UpdatePasswordComponent}, // Anfrage zur Passwortaktualisierung
 
-  {path: 'access-denied', component: AccessDeniedComponent}, // страница "доступ запрещен"
+  {path: 'access-denied', component: AccessDeniedComponent}, // Seite „Zugriff verweigert“.(verboten)
 
-
-  {path: '**', redirectTo: '/'}, // все остальные запросы отправлять на главную страницу
+  {path: '**', redirectTo: '/'}, // Senden Sie alle anderen Anfragen an die Hauptseite
 
 ];
 
-
 @NgModule({
   imports: [
-    RouterModule.forRoot(routes) // без этого работать не будет - импортирует системный модуль
+    RouterModule.forRoot(routes) // funktioniert ohne dies nicht - importiert das Systemmodul
   ],
   exports: [
     RouterModule

@@ -16,24 +16,19 @@ import {Stat} from '../../../model/Stat';
   styleUrls: ['./categories.component.css']
 })
 
-// "presentational component": отображает полученные данные и отправляет какие-либо действия обработчику
-// назначение - работа с категориями
-// класс не видит dataHandler, т.к. напрямую с ним не должен работать
+// "Component": zeigt die empfangenen Daten an und sendet alle Aktionen an den Handler
 export class CategoriesComponent implements OnInit {
 
-  // компонент взаимодействует с "внешним миром" только через @Input() и @Output !!!
+  // Die Komponente interagiert mit der „Außenwelt“ nur durch @Input() und @Output !!!
 
-  // принцип инкапсуляции и "слабой связи"
-  // (Low Coupling) из GRASP —
-  // General Responsibility Assignment Software Patterns (основные шаблоны распределения обязанностей в программном обеспечении)
-  // с помощью @Output() сигнализируем о том, что произошло событие выбора категории (кто будет это обрабатывать - компонент не знает)
-
-
-  // ---------------------------------------------------
-
-  // сеттеры используются для доп. функционала - чтобы при изменении значения вызывать нужные методы
-  // а так можно использовать и обычные переменные
-
+  /*
+  Prinzip der Kapselung und „losen Kopplung“
+  (Low Coupling) aus GRASP — General Responsibility Assignment Software Patterns
+  (Grundmuster der Verantwortungsverteilung in Software)
+  с помощью @Output() сигнализируем о том, что произошло событие выбора категории (кто будет это обрабатывать - компонент не знает)
+  */
+  // Setter werden für zusätzliche Zwecke verwendet Funktionalität - um die erforderlichen Methoden aufzurufen, wenn sich der Wert ändert.
+  // Sie können auch reguläre Variablen verwenden
   @Input('user')
   set setUser(user: User) {
     this.user = user;
@@ -41,7 +36,7 @@ export class CategoriesComponent implements OnInit {
 
   @Input('categories')
   set setCategories(categories: Category[]) {
-    this.categories = categories; // категории для отображения
+    this.categories = categories; // Kategorien, die angezeigt werden sollen
   }
 
   @Input('categorySearchValues')
@@ -54,69 +49,66 @@ export class CategoriesComponent implements OnInit {
     this.selectedCategory = selectedCategory;
   }
 
-  // общая статистика
+  // allgemeine Statistiken
   @Input('stat')
   set statVar(stat: Stat) {
     this.stat = stat;
   }
 
-
-
-  // добавление категории
+  // Hinzufügen einer Kategorie
   @Output()
-  addCategoryEvent = new EventEmitter<Category>(); // передаем только название новой категории
+  addCategoryEvent = new EventEmitter<Category>(); // Wir übermitteln nur den Namen der neuen Kategorie
 
-  // изменение категории
+  // Kategorie ändern
   @Output()
   updateCategoryEvent = new EventEmitter<Category>();
 
-  // удаление категории
+  // Löschen einer Kategorie
   @Output()
   deleteCategoryEvent = new EventEmitter<Category>();
 
-  // поиск категории
+  // Kategorie Suche
   @Output()
-  searchCategoryEvent = new EventEmitter<CategorySearchValues>(); // передаем строку для поиска
+  searchCategoryEvent = new EventEmitter<CategorySearchValues>(); // Измените строку стихотворения
 
   // закрыть меню
   @Output()
-  toggleMenuEvent = new EventEmitter(); // передаем строку для поиска
+  toggleMenuEvent = new EventEmitter(); // Übergeben Sie die Suchzeichenfolge
 
-  // выбрали категорию из списка
+  // eine Kategorie aus der Liste ausgewählt
   @Output()
   selectCategoryEvent = new EventEmitter<Category>();
 
 
   // -------------------------------------------------------------------------
-  // обычные переменные желательно отделять от @Input и @Output
+  // Es empfiehlt sich, gewöhnliche Variablen von @Input und @Output zu trennen
 
-  isMobile: boolean; // зашли на сайт с мобильного устройства или нет?
+  isMobile: boolean; // Haben Sie über ein mobiles Gerät auf die Website zugegriffen oder nicht?
 
-  categories: Category[]; // категории для отображения
+  categories: Category[]; // Kategorien, die angezeigt werden sollen
 
-  // для отображения иконки редактирования при наведении на категорию (десктоп версия)
+  // um das Bearbeitungssymbol anzuzeigen, wenn Sie mit der Maus über eine Kategorie fahren (Desktop-Version)
   indexCategoryMouseOver: number;
-  showEditIconCategoryIcon: boolean; // показывать ли иконку редактирования категории (иниц-ся в смарт компоненте main)
+  showEditIconCategoryIcon: boolean; // ob das Kategorie bearbeitungssymbol angezeigt werden soll (in Haupt-Smart-Komponente initialisiert)
 
-  // для поиска категорий
-  searchTitle: string; // текст для поиска категорий
-  filterChanged: boolean; // были ли изменения в параметре поиска
-  categorySearchValues: CategorySearchValues; // параметры поиска категорий
+  // um Kategorien zu durchsuchen
+  searchTitle: string; // Text für die Suche nach Kategorien
+  filterChanged: boolean; // Gab es Änderungen an den Suchparametern?
+  categorySearchValues: CategorySearchValues; // Kategorien suchoptionen
 
-  selectedCategory: Category; // выбранная категория - если равно null - будет выбираться категория
-  // 'Все'(задачи любой категории (и пустой в т.ч.))
+  selectedCategory: Category; // Ausgewählte Kategorie – wenn null – wird die Kategorie ausgewählt
 
-  user: User; // текущий пользователь
+  user: User; // aktueller Benutzer
 
-  // общая статистика
+  // allgemeine Statistiken
   stat: Stat;
 
   constructor(
-    private dialogRef: MatDialogRef<EditCategoryDialogComponent>, // для работы с текущим диалог. окном
-    @Inject(MAT_DIALOG_DATA) private data: [Category, string], // данные, которые можем передать в диалоговое окно
-    private dialogBuilder: MatDialog, // для открытия нового диалогового окна (из текущего)
-    private translate: TranslateService, // локализация
-    private deviceService: DeviceDetectorService, // определение устройства
+    private dialogRef: MatDialogRef<EditCategoryDialogComponent>, // um mit dem aktuellen Dialog zu arbeiten. Fenster
+    @Inject(MAT_DIALOG_DATA) private data: [Category, string], // Daten, die wir in das Dialogfenster übertragen können
+    private dialogBuilder: MatDialog, // um ein neues Dialogfeld zu öffnen (aus dem aktuellen)
+    private translate: TranslateService, // Lokalisierung
+    private deviceService: DeviceDetectorService, // Geräteerkennung
   ) {
     this.isMobile = deviceService.isMobile();
   }
@@ -124,122 +116,105 @@ export class CategoriesComponent implements OnInit {
   ngOnInit(): void {
   }
 
-
-  // диалоговое окно для добавления новой категории
+  // Dialogfeld zum Hinzufügen einer neuen Kategorie
   openAddDialog(): void {
 
-    // открытие диалог. окна
     this.dialogRef = this.dialogBuilder.open(EditCategoryDialogComponent, {
-      // передаем новый пустой объект для заполнения
+      // Übergeben eines neuen leeren Objekts zum Füllen
       data: [new Category(null, '', this.user), this.translate.instant('CATEGORY.ADDING')],
       width: '400px'
     });
 
-
-    // подписываемся на закрытие диалог. окна
+    // Melden Sie sich an, um den Dialog Fenster zu schließen.
     this.dialogRef.afterClosed().subscribe(result => {
 
-      if (!(result)) { // если просто закрыли окно, ничего не нажав
+      if (!(result)) { // wenn Sie gerade das Fenster geschlossen haben, ohne auf etwas zu klicken
         return;
       }
-
-      if (result.action === DialogAction.SAVE) { // если нажали Сохранить
-        this.addCategoryEvent.emit(result.obj as Category); // вызываем внешний обработчик
+      if (result.action === DialogAction.SAVE) { // wenn Sie auf Speichern geklickt haben
+        this.addCategoryEvent.emit(result.obj as Category); // Rufen Sie den externen Handler auf
       }
     });
-
-
   }
 
-
-  // сохраняет индекс записи категории, над который в данный момент проходит мышка (и там отображается иконка редактирования)
+  // speichert den Index des Kategorie eintrags, über den sich die Maus gerade bewegt (und das Bearbeitungssymbol wird dort angezeigt)
   updateEditIconVisible(show: boolean, index: number): void {
 
-    this.showEditIconCategoryIcon = show; // показать или скрыть иконку
-    this.indexCategoryMouseOver = index; // для того понимать - над каким элементом мы находимся
-
+    this.showEditIconCategoryIcon = show; // Symbol anzeigen oder ausblenden
+    this.indexCategoryMouseOver = index; // um zu verstehen, welches Element wir oben sind
   }
 
-
-  // диалоговое окно для редактирования категории
+  // Dialogfeld zum Bearbeiten der Kategorie
   openEditDialog(category: Category): void {
 
     this.dialogRef = this.dialogBuilder.open(EditCategoryDialogComponent, {
-      // передаем копию объекта, чтобы все изменения не касались оригинала (чтобы их можно было отменить)
+      // Wir übergeben eine Kopie des Objekts, damit sich alle Änderungen nicht auf das Original auswirken
+      // (sodass sie rückgängig gemacht werden können)
       data: [new Category(category.id, category.title, this.user), this.translate.instant('CATEGORY.EDITING')],
       width: '400px'
     });
 
-    // подписываемся на закрытие диалог. окна
+    // Melden Sie sich an, um das Dialogfeld zu schließen.
     this.dialogRef.afterClosed().subscribe(result => {
 
-      if (!(result)) { // если просто закрыли окно, ничего не нажав
+      if (!(result)) { // wenn Sie gerade das Fenster geschlossen haben, ohne auf etwas zu klicken
         return;
       }
 
-      if (result.action === DialogAction.DELETE) { // нажали удалить
-        this.deleteCategoryEvent.emit(category); // вызываем внешний обработчик
+      if (result.action === DialogAction.DELETE) { // auf Löschen geklickt
+        this.deleteCategoryEvent.emit(category); // Rufen Sie den externen Handler auf
         return;
       }
 
-      if (result.action === DialogAction.SAVE) { // нажали сохранить (обрабатывает как добавление, так и удаление)
-        this.updateCategoryEvent.emit(result.obj as Category); // вызываем внешний обработчик
+      if (result.action === DialogAction.SAVE) { // auf „Speichern“ geklickt (behandelt sowohl das Hinzufügen als auch das Löschen)
+        this.updateCategoryEvent.emit(result.obj as Category); // Rufen Sie den externen Handler auf
         return;
       }
     });
   }
 
-
-  // очистить поле поиска и заново обновить список категорий
+  // Löschen Sie das Suchfeld und aktualisieren Sie die Kategorieliste erneut
   clearAndSearch(): void {
     this.searchTitle = null;
-    this.search(); // поиск с пустым значением  searchTitle вернет все категории
+    this.search(); // Bei einer Suche mit leerem searchTitle werden alle Kategorien zurückgegeben
   }
 
-  // проверяет, были ли изменены какие-либо параметры поиска (по сравнению со старым значением)
+  // prüft, ob Suchparameter geändert wurden (im Vergleich zum alten Wert)
   checkFilterChanged(): void {
     this.filterChanged = this.searchTitle !== this.categorySearchValues.title;
   }
 
-
-// поиск категории
+// Kategorie Suche
   search(): void {
 
-    this.filterChanged = false; // сбросить
+    this.filterChanged = false; // zurücksetzen
 
-    if (!this.categorySearchValues) { // если объект с параметрами поиска непустой
+    if (!this.categorySearchValues) { // wenn das Objekt mit Suchparametern nicht leer ist
       return;
     }
-
-    this.categorySearchValues.title = this.searchTitle; // сохраняем в переменную введенный текст пользователя
+    this.categorySearchValues.title = this.searchTitle; // Speichern Sie den eingegebenen Benutzertext in einer Variablen
     this.searchCategoryEvent.emit(this.categorySearchValues);
-
   }
 
-
-  // проверяет остались ли символы в текстовом поле
+  // prüft, ob noch Zeichen im Textfeld vorhanden sind
   checkEmpty(): void {
     if (this.searchTitle.trim().length === 0) {
-      this.search(); // автоматически произвести поиск категорий (сброс всех значений)
+      this.search(); // automatisch nach Kategorien suchen (alle Werte zurücksetzen)
     }
   }
 
   toggleMenu(): void {
-    this.toggleMenuEvent.emit(); // закрыть меню
+    this.toggleMenuEvent.emit(); // Menü schließen
   }
 
-
-  // выбираем категорию для отображения соотв. задач
+  // Wählen Sie eine Kategorie aus, um die entsprechende anzuzeigen, Aufgaben
   showCategory(category: Category): void {
 
-    // если не изменилось значение, ничего не делать (чтобы лишний раз не делать запрос данных)
+    // Wenn sich der Wert nicht geändert hat, tun Sie nichts (um keine erneuten Datenanforderungen zu stellen).
     if (this.selectedCategory === category) {
       return;
     }
-
-    this.selectedCategory = category; // сохраняем выбранную категорию
-    this.selectCategoryEvent.emit(this.selectedCategory); // вызываем внешний обработчик и передаем выбранную категорию
+    this.selectedCategory = category; // Speichern Sie die ausgewählte Kategorie
+    this.selectCategoryEvent.emit(this.selectedCategory); // Rufen Sie den externen Handler auf und übergeben Sie die ausgewählte Kategorie
   }
-
-
 }

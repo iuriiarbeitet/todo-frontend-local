@@ -19,45 +19,29 @@ import {animate, state, style, transition, trigger} from '@angular/animations';
                 overflow: 'hidden',
                 height: '0px',
             })),
-
-
             transition('* => *', animate('300ms ease-in-out'))
-
         ])
-
-
     ]
 })
 
-// "presentational component": отображает полученные данные и отправляет какие-либо действия обработчику
-// назначение - показать статистику
+// "presentational component": zeigt die empfangenen Daten an und sendet alle Aktionen an den Handler
+// Zweck - Statistiken anzeigen
 export class StatComponent implements OnInit {
 
-
-    // ----------------------- входящие параметры ----------------------------
-
-
+    // ----------------------- eingehende Parameter ----------------------------
     @Input()
-    dash: DashboardData; // данные дэшбоарда
+    dash: DashboardData; // Dashboard-Daten
 
     @Input('showStat')
-    set setShowStat(show: boolean) { // показать или скрыть статистику
-
+    set setShowStat(show: boolean) { // Statistiken ein- oder ausblenden
         this.showStatistics = show;
-        this.initStatDash(); // каждый раз при изменении значения - показывать анимацию скрытия/показа
-
+        this.initStatDash(); // Jedes Mal, wenn sich der Wert ändert, wird die Animation ein-/ausgeblendet
     }
 
-
-    // -------------------------------------------------------------------------
-
-
     showStatistics: boolean;
-    animationState: string; // для анимации скрытия/показа
-
+    animationState: string; // zum Ausblenden/Einblenden von Animationen
 
     constructor() {
-
     }
 
     ngOnInit(): void {
@@ -65,7 +49,7 @@ export class StatComponent implements OnInit {
 
     getTotal(): number {
         if (this.dash) {
-            return this.dash.completedTotal + this.dash.uncompletedTotal; // суммируем завершенные и незавершенные задачи
+            return this.dash.completedTotal + this.dash.uncompletedTotal; // Fassen Sie erledigte und noch nicht erledigte Aufgaben zusammen
         }
     }
 

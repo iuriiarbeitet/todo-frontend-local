@@ -64,10 +64,10 @@ import {StatCardComponent} from './business/views/page/stat/stat-card/stat-card.
 registerLocaleData(localeDe);
 
 
-// для загрузки переводов по сети
+// Übersetzungen online herunterladen
 function HttpLoaderFactory(httpClient: HttpClient): MultiTranslateHttpLoader {
   return new MultiTranslateHttpLoader(httpClient, [
-    {prefix: environment.frontendURL + '/assets/i18n/', suffix: '.json'} // путь к папке и суффикс файлов
+    {prefix: environment.frontendURL + '/assets/i18n/', suffix: '.json'} // Ordnerpfad und Dateisuffix
   ]);
 }
 
@@ -118,7 +118,7 @@ function HttpLoaderFactory(httpClient: HttpClient): MultiTranslateHttpLoader {
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
-        useFactory: HttpLoaderFactory, // для загрузки  переводов по сети
+        useFactory: HttpLoaderFactory, // Übersetzungen online herunterladen
         deps: [HttpClient]
       }
     }),
@@ -135,9 +135,9 @@ function HttpLoaderFactory(httpClient: HttpClient): MultiTranslateHttpLoader {
     ColorPickerModule,
 
   ],
-  providers: [ // инициализация системных объектов с нужными параметрами
+  providers: [ // Initialisierung von Systemobjekten mit den notwendigen Parametern
 
-    /* нужно указывать для корректной работы диалоговых окон */
+    /* muss angegeben werden, damit Dialogfelder ordnungsgemäß funktionieren */
     { provide: MAT_DIALOG_DATA, useValue: {} },
     { provide: MatDialogRef, useValue: {} },
 
@@ -172,7 +172,7 @@ function HttpLoaderFactory(httpClient: HttpClient): MultiTranslateHttpLoader {
     },
 
     {
-      provide: HTTP_INTERCEPTORS, // все HTTP запросы будут выполняться с отображением индикатора загрузки
+      provide: HTTP_INTERCEPTORS, // Alle HTTP-Anfragen werden mit einer Ladeanzeige ausgeführt
       useClass: ShowSpinnerInterceptor,
       multi: true
     },

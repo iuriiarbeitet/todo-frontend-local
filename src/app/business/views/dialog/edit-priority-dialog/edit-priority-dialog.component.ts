@@ -12,52 +12,48 @@ import {Priority} from '../../../model/Priority';
   styleUrls: ['./edit-priority-dialog.component.css']
 })
 
-// создание/редактирование категории
+// Erstellen/Bearbeiten einer Kategorie
 export class EditPriorityDialogComponent implements OnInit {
 
-
   constructor(
-    private dialogRef: MatDialogRef<EditPriorityDialogComponent>, // // для возможности работы с текущим диалог. окном
-    @Inject(MAT_DIALOG_DATA) private data: [Priority, string], // данные, которые передали в диалоговое окно
-    private dialog: MatDialog, // для открытия нового диалогового окна (из текущего) - например для подтверждения удаления
-    private translate: TranslateService // локализация
+    private dialogRef: MatDialogRef<EditPriorityDialogComponent>, // um mit dem aktuellen Dialogfenster arbeiten zu können
+    @Inject(MAT_DIALOG_DATA) private data: [Priority, string], // Daten, die an das Dialogfeld übergeben wurden
+    private dialog: MatDialog, // um ein neues Dialogfeld (aus dem aktuellen) zu öffnen – beispielsweise um den Löschvorgang zu bestätigen
+    private translate: TranslateService // Lokalisierung
   ) {
   }
 
-  dialogTitle: string; // текст для диалогового окна
-  priority: Priority; // текст для названия приоритета (при реактировании или добавлении)
-  canDelete = false; // можно ли удалять объект (активна ли кнопка удаления)
+  dialogTitle: string;
+  priority: Priority; // Text für den Prioritätsnamen (beim Bearbeiten oder Hinzufügen)
+  canDelete = false; // Ist es möglich, ein Objekt zu löschen (ist die Schaltfläche „Löschen“ aktiv)?
 
   ngOnInit(): void {
     this.priority = this.data[0];
     this.dialogTitle = this.data[1];
 
-    // если присутствует id, значит это редактирование, поэтому делаем удаление возможным (иначе скрываем иконку)
+    // Wenn eine ID vorhanden ist, handelt es sich um eine Bearbeitung, daher ermöglichen wir das Löschen.
     if (this.priority && this.priority.id > 0) {
       this.canDelete = true;
     }
-
-
   }
 
-  // нажали ОК
+  // klickte auf OK
   confirm(): void {
 
-    // если не ввели название - выходим из метода и не даем сохранить
-    // (пользователь будет обязан ввести какое-либо значение или просто закрыть окно)
+    // Wenn Sie keinen Namen eingegeben haben, beenden wir die Methode und lassen Sie sie nicht speichern
+    // (Der Benutzer muss einen Wert eingeben oder einfach das Fenster schließen)
     if (!this.priority.title || this.priority.title.trim().length === 0) {
       return;
     }
-
-    this.dialogRef.close(new DialogResult(DialogAction.SAVE, this.priority)); // передаем обратно измененный объект
+    this.dialogRef.close(new DialogResult(DialogAction.SAVE, this.priority)); // Zurückgeben des geänderten Objekts
   }
 
-  // нажали отмену
+  // Abbrechen gedrückt
   cancel(): void {
     this.dialogRef.close(new DialogResult(DialogAction.CANCEL));
   }
 
-  // нажали Удалить
+  // klickte auf Löschen
   delete(): void {
 
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
@@ -71,16 +67,13 @@ export class EditPriorityDialogComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
 
-      if (!(result)) { // если просто закрыли окно, ничего не нажав
+      if (!(result)) { // wenn Sie gerade das Fenster geschlossen haben, ohne auf etwas zu klicken
         return;
       }
-
-
       if (result.action === DialogAction.OK) {
-        this.dialogRef.close(new DialogResult(DialogAction.DELETE)); // нажали удалить
+        this.dialogRef.close(new DialogResult(DialogAction.DELETE)); // auf Löschen geklickt
       }
     });
-
 
   }
 }

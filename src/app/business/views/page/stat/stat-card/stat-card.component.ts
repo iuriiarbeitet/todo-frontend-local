@@ -6,8 +6,8 @@ import {Component, Input, OnInit} from '@angular/core';
     styleUrls: ['./stat-card.component.css']
 })
 
-// "presentational component": отображает полученные данные
-// карточка для отображения статистики
+// "presentational component": zeigt empfangene Daten an
+// Karte zur Anzeige von Statistiken
 export class StatCardComponent implements OnInit {
 
     @Input()

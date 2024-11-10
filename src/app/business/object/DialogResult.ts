@@ -1,25 +1,25 @@
-// используется в диалоговых окнах, где может быть множество действий с результатом, а не только ОК и отмена
+// Wird in Dialogfeldern verwendet, in denen es viele Aktionen mit einem Ergebnis geben kann, nicht nur „OK“ und „Abbrechen“.
 
 
 export class DialogResult {
     action: DialogAction;
-    obj: any; // для передачи параметров, объектов
+    obj: any; // zur Übergabe von Parametern, Objekten
 
 
-    // ? означает необязательный параметр
+    // ? bedeutet optionaler Parameter
     constructor(action: DialogAction, obj?: any) {
         this.action = action;
         this.obj = obj;
     }
 }
 
-// всевозможные действия в диалоговом окне (можно разбить по разным enum)
+// alle möglichen Aktionen im Dialogfeld (können in verschiedene unterteilt werden, enum)
 export enum DialogAction {
-    SETTINGS_CHANGE, // настройки были изменены
-    SAVE, // сохранение изменений
-    OK, // для подтверждения действий
-    CANCEL, // отмена всех действий
-    DELETE, // удаление объекта
-    COMPLETE, // завершение задачи
-    ACTIVATE// возврат задачи в активное состояние (нерешенная)
+    SETTINGS_CHANGE, // Einstellungen wurden geändert
+    SAVE, // Speichern von Änderungen
+    OK, // um Aktionen zu bestätigen
+    CANCEL, // Alle Aktionen abbrechen
+    DELETE, // Löschen eines Objekts
+    COMPLETE, // eine Aufgabe erledigen
+    ACTIVATE// Zurücksetzen der Aufgabe in den aktiven Zustand (ungelöst)
 }

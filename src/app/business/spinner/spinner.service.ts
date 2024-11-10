@@ -1,5 +1,5 @@
 
-// сервис для отображения спиннера загрузки
+// Dienst zur Anzeige des Ladespinners
 import {Injectable} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
 

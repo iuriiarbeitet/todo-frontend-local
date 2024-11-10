@@ -6,27 +6,26 @@ import {SpinnerService} from './spinner.service';
 
 
 @Injectable()
-// перехватывает все HTTP запросы для показа спиннера загрузки
+// fängt alle HTTP-Anfragen ab, um den Lade-Spinner anzuzeigen
 export class ShowSpinnerInterceptor implements HttpInterceptor {
 
     constructor(private spinnerService: SpinnerService) {
     }
 
-    // перехватываем все HTTP запросы
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
-        this.spinnerService.show(); // показать спиннер
+        this.spinnerService.show();
 
         return next
             .handle(req)
             .pipe(
                 tap((event: HttpEvent<any>) => {
-                    if (event instanceof HttpResponse) { // пришел ответ - значит запрос завершен
-                        this.spinnerService.hide(); // когда запрос выполнился - убрать спиннер
+                    if (event instanceof HttpResponse) {
+                        this.spinnerService.hide(); // Wenn die Anfrage abgeschlossen ist, entfernen Sie den Spinner
                     }
                 }, (error) => {
                     console.log(error);
-                    this.spinnerService.hide(); // если возникла ошибка - убрать спиннер
+                    this.spinnerService.hide(); // Wenn ein Fehler auftritt, entfernen Sie den Spinner
                 })
             );
     }

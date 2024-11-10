@@ -1,6 +1,6 @@
 
-// спец. класс для перевода компонента MatPaginator (реализация - из документации)
-// пример https://dsebastien.medium.com/translating-the-matpaginator-angular-material-component-f72b52158dfc
+// besonders Klasse zum Übersetzen der MatPaginator-Komponente (Implementierung - aus der Dokumentation)
+// Beispiel https://dsebastien.medium.com/translating-the-matpaginator-angular-material-component-f72b52158dfc
 import {Injectable} from '@angular/core';
 import {MatPaginatorIntl} from '@angular/material/paginator';
 import {TranslateService} from '@ngx-translate/core';
@@ -9,7 +9,7 @@ import {TranslateService} from '@ngx-translate/core';
 export class TasksMatPaginatorIntl extends MatPaginatorIntl {
 
     constructor(
-        private translate: TranslateService, // для локализации
+        private translate: TranslateService, // zur Lokalisierung
     ) {
         super();
         super.itemsPerPageLabel = translate.instant('PAGING.PAGE-SIZE');

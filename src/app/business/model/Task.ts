@@ -5,15 +5,16 @@ import {User} from '../../auth/service/auth.service';
 export class Task {
   id: number;
   title: string;
-  completed: number; // вместо boolean, чтобы удобный было записывать в БД
+  completed: number; // anstelle von boolean, um das Schreiben in die Datenbank zu erleichtern
   priority: Priority;
   category: Category;
   taskDate?: Date;
-  user: User; // чтобы знать, для какого пользователя добавляем задачу
+  user: User; // um zu wissen, für welchen Benutzer wir eine Aufgabe hinzufügen
 
-  // сюда будет записывать старое значение,
-// которое изменили на новое (нужно для правильного обновления счетчиков категорий -
-// сначала обновляем стат-ку старой категории, затем новой)
+  /*
+    der alte Wert wird hier geschrieben, was in ein neues geändert wurde (notwendig für die korrekte Aktualisierung der Kategoriezähler -
+    aktualisiere zuerst die Statistiken der alten Kategorie, dann der neuen)
+   */
   oldCategory: Category;
 
   constructor(id: number, title: string, completed: number, priority: Priority, category: Category, user: User, taskDate?: Date) {

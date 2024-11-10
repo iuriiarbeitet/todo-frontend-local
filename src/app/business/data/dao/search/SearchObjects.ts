@@ -1,32 +1,32 @@
-// все возможные параметры поиска категорий
+// alle möglichen Suchparameter für Kategorien
 export class CategorySearchValues {
     title: string = null;
-    email: string = null; // фильтрация для конкретного пользователя
+    email: string = null; // Filtern nach einem bestimmten Benutzer
 }
 
-// все возможные параметры поиска приоритетов
+// alle möglichen Prioritätssuchparameter
 export class PrioritySearchValues {
     title: string = null;
-    email: string = null; // фильтрация для конкретного пользователя
+    email: string = null; // Filtern nach einem bestimmten Benutzer
 }
 
-// все возможные параметры поиска категорий
+// alle möglichen Suchparameter für Kategorien
 export class TaskSearchValues {
 
-    // начальные значения по-умолчанию (задаем null, чтобы не было значение undefined)
+    // Standard-Anfangswerte (null setzen, damit es keinen undefinierten Wert gibt)
     title = '';
     completed: number = null;
     priorityId: number = null;
     categoryId: number = null;
 
-    dateFrom: Date = null; // только дата, без времени
-    dateTo: Date = null; // только дата, без времени
+    dateFrom: Date = null;
+    dateTo: Date = null;
 
-    email: string = null; // фильтрация для конкретного пользователя
-    pageNumber = 0; // 1-я страница (значение по-умолчанию)
-    pageSize = 5; // сколько элементов на странице (значение по-умолчанию)
+    email: string = null;
+    pageNumber = 0;
+    pageSize = 5;
 
-    // сортировка
+    // Sortierung
     sortColumn = 'title';
     sortDirection = 'asc';
 
